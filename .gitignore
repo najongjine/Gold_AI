@@ -1,0 +1,12 @@
+# Python Bytecode Files
+*.pyc
+__pycache__/
+
+# Dependencies
+venv/
+.venv/
+.mypy_cache/
+
+# ⭐️ 학습된 모델 및 결과 폴더 제외 ⭐️
+my_local_models/
+model_save/
