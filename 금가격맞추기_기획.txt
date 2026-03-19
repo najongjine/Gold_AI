@@ -1,44 +1,95 @@
-1. 분석 목적
-핵심 목표: 현 시점 대비 향후 60일간의 평균 금 가격이 상승할지 하락할지, 그 기대 수익률(%)을 예측.
+📊 글로벌 금 추세 예측 머신러닝 모델 구축 기획서 (v6)
+[목적]
+글로벌 거시경제 지표와 기술적 지표를 활용하여, 60일 이후의 금 가격 추세(이동평균선 대비 변화율)를 예측하는 LightGBM 기반 회귀 모델을 구축한다.
 
-차별점: 특정일의 종가가 아닌 '60일간의 흐름(평균)'을 타겟으로 하여 예측 안정성 확보.
+[사용 기술 스택]
 
-2. 데이터 수집 (yfinance)
-글로벌 금값에 영향을 주는 5대 핵심 지표를 수집합니다.
+Data & ML: pandas, numpy, yfinance, lightgbm, sklearn
 
-금 선물 (GC=F): 예측 대상 (Target & Feature)
+Visualization: matplotlib.pyplot
 
-달러 지수 (DX-Y.NYB): 역상관 관계 분석용
+1단계: 데이터 수집 (Data Collection)
+yfinance 라이브러리를 사용하여 최근 10년 치 일봉 데이터를 수집한다. 결측치는 앞방향 채우기(ffill) 후 뒷방향 채우기(bfill)로 처리한다.
 
-미국채 10년물 (^TNX): 실질 금리 영향 분석용
+수집 대상 지표 (Tickers):
 
-공포 지수 (^VIX): 시장 불안정성 측정
+금 선물 (Gold): GC=F
 
-S&P 500 (^GSPC): 위험 자산 선호도 측정
+달러 지수 프록시 (Dollar_Index): UUP (ETF)
 
-3. 데이터 전처리 및 스무딩 (Smoothing)
-과거 60일 이동평균 (MA60): 모든 입력 데이터에 60일 이동평균을 적용하여 중기 추세 데이터로 변환.
+미국채 10년물 명목 금리 (US10Y_Treasury): ^TNX
 
-노이즈 제거: 일일 변동성보다는 60일간의 '축적된 힘'을 모델이 학습하도록 유도.
+물가연동채 ETF (TIPS_ETF): TIP
 
-4. 파생변수 생성 (Feature Engineering)
-LightGBM의 성능을 극대화하기 위해 아래 변수들을 생성합니다.
+공포 지수 (VIX): ^VIX
 
-이격도 (Disparity): 현재가 / 과거 60일 이평선 (현재가 과열/저평가 여부)
+S&P 500 지수 (S&P500): ^GSPC
 
-상대적 수익률: 금 대비 달러/금리의 변동 비율
+출력물: 수집 및 병합된 원본 데이터 gold_data_raw.csv 저장
 
-Lag 데이터: 1일 전, 7일 전, 15일 전의 지표 상태를 피처로 추가
+2단계: 데이터 전처리 및 스무딩 (Preprocessing & Smoothing)
+노이즈 제거를 위해 원본 데이터에 대해 **60일 단순 이동평균(Rolling Mean)**을 적용한다.
 
-변동성 지표: 최근 60일간의 표준편차 (가격이 얼마나 출렁이는지)
+조건: 스무딩 처리 후 발생하는 NaN 값은 제거(Drop)한다.
 
-5. 타겟 설정 (Labeling) - 사용자 의도 핵심 반영
-현재 시점(t)의 60일 이동평균 대비 60일 후(t+60)의 이동평균의 변화율(%)을 타겟으로 설정합니다.
-의미: "현재의 중기 가격 추세가 두 달 뒤에는 어떻게 변해있을 것인가?"
+출력물: gold_data_smoothed.csv 저장
 
-6. 모델링 전략
-알고리즘: LightGBM (시계열 특성과 비선형 회귀에 강함)
+3단계: 파생변수 생성 (Feature Engineering)
+원본 데이터와 스무딩 데이터를 활용하여 모델 학습에 사용할 피처들을 생성한다. 생성 후 발생하는 NaN은 ffill과 bfill로 처리한다.
 
-평가 지표: MAE(평균 절대 오차) 및 방향성 적중률(Directional Accuracy)
+수익률 (Returns): 모든 원본 지표의 일일 수익률(%)
 
-검증 방식: TimeSeriesSplit (과거 데이터로 미래를 예측하는 시계열 전용 교차 검증)
+이격도 (Disparity): (원본 데이터 / 스무딩 데이터 - 1) * 100 (모든 지표 대상)
+
+자산 간 상대 지표 (Ratios):
+
+Gold_to_SP500_Ratio: 금 / S&P500
+
+Gold_to_Dollar_Ratio: 금 / 달러 지수
+
+실질금리 프록시 (Real_Rate_Proxy): US10Y_Treasury - TIPS_ETF의 60일 수익률(%)
+
+금 RSI (Relative Strength Index): 금 원본 데이터 기준 14일 RSI
+
+금 MACD (Moving Average Convergence Divergence):
+
+MACD_Line: EMA(12) - EMA(26)
+
+MACD_Signal: MACD_Line의 EMA(9)
+
+MACD_Hist: MACD_Line - MACD_Signal
+
+변동성 (Volatility): 모든 원본 지표의 60일 기준 일일 수익률 표준편차
+
+Lag 데이터: 금과 달러 지수 수익률의 과거 1일, 7일, 15일 전 데이터 시프트(Lag)
+
+출력물: gold_features.csv 저장
+
+4단계: 타겟 변수 설정 (Labeling)
+정의: 현재 60일 이평선 가격 대비 60일 미래의 60일 이평선 가격 변화율(%)
+
+수식: (미래 60일 뒤의 스무딩된 금 가격 / 현재 스무딩된 금 가격 - 1) * 100
+
+컬럼명: Target_Return
+
+5단계: 모델링 및 검증 전략 (Modeling Strategy)
+타겟 누수(Data Leakage) 및 과적합 방지를 위해 학습 전 절대 가격 지표(Gold, Dollar_Index, US10Y_Treasury, TIPS_ETF, VIX, S&P500)는 피처에서 완전히 삭제한다.
+
+알고리즘: LGBMRegressor
+
+하이퍼파라미터: * n_estimators=1000, learning_rate=0.05, num_leaves=31
+
+random_state=42, importance_type='gain', verbose=-1
+
+교차 검증 방법: 시계열 특성을 반영하여 TimeSeriesSplit(n_splits=5) 사용
+
+평가 지표:
+
+MAE (Mean Absolute Error): 실제 수익률과 예측 수익률의 절대 오차 평균
+
+방향성 적중률 (Directional Accuracy %): 실제 수익률의 부호(+, -)와 예측 수익률의 부호가 일치하는 비율
+
+6단계: 최종 시각화 및 출력 결과물
+콘솔 출력: 검증 결과 요약 (평균 MAE, 평균 방향성 적중률) 및 상위 10개 피처 중요도(Feature Importances)
+
+그래프 저장: 테스트 셋에 대한 실제 타겟값(Actual Return, 회색)과 예측값(Predicted Return, 파란색)의 시계열 추이 비교 그래프 (prediction_result_v6.png로 저장. 타이틀에 MAE 포함)
