@@ -115,37 +115,48 @@ def preprocess_and_smooth(df, window=60):
 def engineer_features(df_raw, df_smoothed):
     """
     기획서의 4단계: 파생변수 생성 (Feature Engineering)
-    이격도, 상대적 수익률, Lag 데이터, 변동성 지표 등을 생성합니다.
+    비정상성(Non-stationarity) 문제 해결을 위해 절대 가격을 제거하고
+    수익률, 이격도, 자산 간 비율 등 상대적 지표를 생성합니다.
     """
     print("파생변수 생성을 시작합니다...")
     
     # 공통 인덱스 설정 (스무딩된 데이터의 인덱스 기준)
     common_index = df_smoothed.index
-    df_features = df_smoothed.copy()
+    df_features = pd.DataFrame(index=common_index)
     
-    # 1. 이격도 (Disparity): 현재가 / 60일 이평선
-    # df_raw를 common_index에 맞게 재색인
+    # 1. 수익률 (Returns): 오늘 가격이 어제보다 몇 % 변했나?
+    # (절대 수치의 커짐에 따른 왜곡 방지)
+    for col in df_raw.columns:
+        df_features[f'{col}_Returns'] = df_raw[col].pct_change().loc[common_index] * 100
+    
+    # 2. 이격도 (Disparity): 60일 평균 대비 현재 가격이 몇 % 위에 있나?
     df_raw_aligned = df_raw.loc[common_index]
     for col in df_raw.columns:
-        df_features[f'{col}_Disparity'] = df_raw_aligned[col] / df_smoothed[col]
+        # (현재가 / 60일 이평 - 1) * 100
+        df_features[f'{col}_Disparity'] = (df_raw_aligned[col] / df_smoothed[col] - 1) * 100
     
-    # 2. 변동성 (Volatility): 최근 60일간의 표준편차
+    # 3. 자산 간 상대 지표 (Ratios)
+    # 금값 / S&P500 (자산 간 상대적 강세)
+    df_features['Gold_to_SP500_Ratio'] = df_raw_aligned['Gold'] / df_raw_aligned['S&P500']
+    
+    # 금값 / 달러 인덱스 (실질 화폐 가치 반영)
+    df_features['Gold_to_Dollar_Ratio'] = df_raw_aligned['Gold'] / df_raw_aligned['Dollar_Index']
+    
+    # 4. 변동성 (Volatility): 최근 60일간의 표준편차 (수익률 기준 변동성으로 변경)
     for col in df_raw.columns:
-        vol = df_raw[col].rolling(window=60).std()
+        vol = df_raw[col].pct_change().rolling(window=60).std()
         df_features[f'{col}_Volatility'] = vol.loc[common_index]
     
-    # 3. Lag 데이터: 1일 전, 7일 전, 15일 전의 지표 상태
-    # (주의: raw 데이터에서 shift를 해야 현재 시점 기준 과거 데이터를 정확히 가져옴)
+    # 5. Lag 데이터: 1일 전, 7일 전, 15일 전의 '수익률' 상태 (절대값 대신 수익률 사용)
     for col in ['Gold', 'Dollar_Index']:
         for lag in [1, 7, 15]:
-            df_features[f'{col}_Lag_{lag}'] = df_raw[col].shift(lag).loc[common_index]
-            
-    # 4. 수익률 관련 (기초 데이터의 변화율)
-    for col in df_raw.columns:
-        df_features[f'{col}_PctChange'] = df_raw[col].pct_change().loc[common_index]
+            df_features[f'{col}_Returns_Lag_{lag}'] = df_features[f'{col}_Returns'].shift(lag)
 
     # 결측치 처리 (Lag 등으로 인해 발생할 수 있는 NaN 채움)
     df_features = df_features.ffill().bfill()
+    
+    # 주의: 절대 가격 컬럼(Gold, Dollar_Index 등)은 df_features에 포함하지 않음으로써
+    # 비정상성 문제를 원천적으로 방지함.
     
     print(f"파생변수 생성 완료. 데이터 크기: {df_features.shape}")
     print(f"생성된 컬럼: {df_features.columns.tolist()}")
@@ -297,6 +308,12 @@ if __name__ == "__main__":
         
         # 5. 데이터 합치기 (Feature + Target)
         df_final = pd.concat([df_features, series_target], axis=1).dropna()
+        
+        # 절대 가격 컬럼 제거 (비정상성 방지)
+        cols_to_drop = ['Gold', 'Dollar_Index', 'US10Y_Treasury', 'VIX', 'S&P500']
+        # 이미 engineer_features에서 안 넣었을 수도 있지만, 명시적으로 한 번 더 처리
+        df_final = df_final.drop(columns=[c for c in cols_to_drop if c in df_final.columns])
+        
         print(f"최종 데이터셋 준비 완료. 데이터 크기: {df_final.shape}")
         
         # 6. 모델 학습 및 평가
