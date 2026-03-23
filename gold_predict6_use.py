@@ -33,6 +33,34 @@ YF_CACHE_DIR = os.path.join(os.getcwd(), ".yfinance_cache")
 os.makedirs(YF_CACHE_DIR, exist_ok=True)
 yf.set_tz_cache_location(YF_CACHE_DIR)
 
+CREATE_TABLE_SQL = f"""
+CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
+    id SERIAL PRIMARY KEY,
+    ml VARCHAR NOT NULL DEFAULT '',
+    gru VARCHAR NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+"""
+
+CREATE_UPDATED_AT_FUNCTION_SQL = """
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+"""
+
+CREATE_UPDATED_AT_TRIGGER_SQL = f"""
+DROP TRIGGER IF EXISTS trg_t_gold_model_updated_at ON {TABLE_NAME};
+CREATE TRIGGER trg_t_gold_model_updated_at
+BEFORE UPDATE ON {TABLE_NAME}
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+"""
+
 
 def fetch_gold_data(period: str = DATA_PERIOD) -> Tuple[Optional[pd.DataFrame], Dict[str, str]]:
     print("데이터 수집을 시작합니다.")
@@ -383,6 +411,9 @@ def save_report_to_postgres(ml_report: str, gru_report: str = "") -> None:
     try:
         with conn:
             with conn.cursor() as cur:
+                cur.execute(CREATE_TABLE_SQL)
+                cur.execute(CREATE_UPDATED_AT_FUNCTION_SQL)
+                cur.execute(CREATE_UPDATED_AT_TRIGGER_SQL)
                 cur.execute(
                     f"INSERT INTO {TABLE_NAME} (ml, gru) VALUES (%s, %s)",
                     (ml_report, gru_report),
