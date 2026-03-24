@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import os
@@ -23,37 +22,38 @@ def fetch_gold_data():
     gold.index.name = 'Date'
     return gold
 
-# 2. 전처리 (60일 이동평균 및 타겟 생성)
-def preprocess_data(df, window=60):
-    print(f"{window}일 이동평균 및 타겟 변수를 생성합니다...")
-    # 60일 이동평균 추가
-    df['MA60'] = df['Close'].rolling(window=window).mean()
+# 2. 전처리 (이동평균 및 타겟 생성)
+def preprocess_data(df, ma_window=60, horizon=60):
+    print(f"{ma_window}일 이동평균 및 {horizon}일 후 타겟 수익률을 생성합니다...")
+    # 이동평균 추가
+    df['MA'] = df['Close'].rolling(window=ma_window).mean()
     
-    # 60일 후의 가격을 타겟으로 설정
-    df['Target'] = df['Close'].shift(-window)
+    # 1. 이격도 (현재가 / 이동평균 - 1) * 100
+    df['Disparity'] = (df['Close'] / df['MA'] - 1) * 100
+    # 2. 이동평균 모멘텀 (현재 MA / 이전 MA - 1) * 100
+    df['MA_Momentum'] = (df['MA'] / df['MA'].shift(1) - 1) * 100
+    
+    # 타겟 설정: 특정 시점 MA 대비 horizon일 후 MA의 변화율 (%)
+    df['Target_Return'] = (df['MA'].shift(-horizon) / df['MA'] - 1) * 100
     
     # 결측치 제거
     df = df.dropna()
     return df
 
-# 3. 데이터 시퀀스 변환 및 스케일링
-def prepare_sequences(df, window_size=60):
-    print("데이터 시퀀스 및 스케일링을 수행합니다...")
-    features = df[['Close', 'MA60']].values
-    target = df['Target'].values.reshape(-1, 1)
+# 3. 데이터 시퀀스 변환 (스케일링 없음)
+def prepare_sequences(df, seq_len=120):
+    print(f"데이터 시퀀스(길이: {seq_len})를 생성합니다 (스케일러 사용 안 함)...")
+    # 피처: 이격도와 MA 모멘텀
+    features = df[['Disparity', 'MA_Momentum']].values
+    target = df['Target_Return'].values.reshape(-1, 1)
     
-    scaler_x = StandardScaler()
-    scaler_y = StandardScaler()
-    
-    features_scaled = scaler_x.fit_transform(features)
-    target_scaled = scaler_y.fit_transform(target)
-    
+    # 이미 % 단위이므로 스케일링 없이 진행
     X, y = [], []
-    for i in range(len(features_scaled) - window_size):
-        X.append(features_scaled[i:i+window_size])
-        y.append(target_scaled[i+window_size])
+    for i in range(len(features) - seq_len):
+        X.append(features[i:i+seq_len])
+        y.append(target[i+seq_len])
         
-    return np.array(X), np.array(y), scaler_x, scaler_y
+    return np.array(X), np.array(y)
 
 # 4. GRU 모델 정의
 class GRUModel(nn.Module):
@@ -71,12 +71,16 @@ class GRUModel(nn.Module):
         return out
 
 if __name__ == "__main__":
-    # 데이터 처리
-    df = fetch_gold_data()
-    df = preprocess_data(df)
+    # 데이터 처리 관련 설정
+    ma_window = 60    # 이동평균 윈도우
+    seq_len = 120      # 입력 시퀀스 길이
+    horizon = 60      # 예측 거리 (60일 후)
     
-    window_size = 60
-    X, y, scaler_x, scaler_y = prepare_sequences(df, window_size)
+    # 데이터 수집 및 처리
+    df = fetch_gold_data()
+    df = preprocess_data(df, ma_window=ma_window, horizon=horizon)
+    
+    X, y = prepare_sequences(df, seq_len=seq_len)
     
     # 모델 하이퍼파라미터
     input_dim = 2
@@ -91,7 +95,7 @@ if __name__ == "__main__":
     tscv = TimeSeriesSplit(n_splits=5)
     mae_list = []
     
-    print("\n학습 및 검증을 시작합니다 (TimeSeriesSplit)...")
+    print(f"\n수익률 예측 학습 및 검증을 시작합니다 (TimeSeriesSplit)...")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
@@ -140,34 +144,35 @@ if __name__ == "__main__":
                 fold_preds.extend(outputs.cpu().numpy())
                 fold_actuals.extend(batch_y.numpy())
         
-        # 역변환
-        fold_preds_inv = scaler_y.inverse_transform(np.array(fold_preds))
-        fold_actuals_inv = scaler_y.inverse_transform(np.array(fold_actuals))
+        # 역변환 과정 생략 (이미 % 단위)
+        fold_preds = np.array(fold_preds)
+        fold_actuals = np.array(fold_actuals)
         
-        mae = mean_absolute_error(fold_actuals_inv, fold_preds_inv)
+        mae = mean_absolute_error(fold_actuals, fold_preds)
         mae_list.append(mae)
-        print(f"Fold {fold+1} MAE: {mae:.2f}")
+        print(f"Fold {fold+1} MAE (Returns): {mae:.4f}%")
         
         # 마지막 폴드의 예측값 저장 (시각화용)
         if fold == 4:
-            all_actual = fold_actuals_inv
-            all_predicted = fold_preds_inv
+            all_actual = fold_actuals
+            all_predicted = fold_preds
 
-    print(f"\n평균 MAE: {np.mean(mae_list):.2f}")
+    print(f"\n평균 MAE (수익률): {np.mean(mae_list):.4f}%")
 
     # 시각화 (마지막 Fold 기준)
     plt.figure(figsize=(12, 6))
-    plt.plot(all_actual, label='Actual Gold Price', color='gray', alpha=0.6)
-    plt.plot(all_predicted, label='Predicted Gold Price (GRU)', color='blue')
-    plt.title(f'Gold Price Prediction (GRU) - Last Fold (MAE: {np.mean(mae_list):.2f})')
+    plt.plot(all_actual, label='Actual MA Return (%)', color='gray', alpha=0.6)
+    plt.plot(all_predicted, label='Predicted MA Return (%)', color='blue')
+    plt.axhline(0, color='red', linestyle='--', alpha=0.5)
+    plt.title(f'Gold Price MA Return Prediction (GRU) - Last Fold (MAE: {np.mean(mae_list):.4f}%)')
     plt.xlabel('Days')
-    plt.ylabel('Price')
+    plt.ylabel('Return (%)')
     plt.legend()
     plt.grid(True)
-    plt.savefig('gold_gru_prediction.png')
-    print("예측 결과 그래프가 'gold_gru_prediction.png'로 저장되었습니다.")
+    plt.savefig('gold_gru_return_prediction.png')
+    print("예측 결과 그래프가 'gold_gru_return_prediction.png'로 저장되었습니다.")
     
     # CSV 저장 (마지막 Fold 예측)
-    res_df = pd.DataFrame({'Actual': all_actual.flatten(), 'Predicted': all_predicted.flatten()})
-    res_df.to_csv('gold_gru_result.csv', index=False)
-    print("예측 결과가 'gold_gru_result.csv'로 저장되었습니다.")
+    res_df = pd.DataFrame({'Actual_Return': all_actual.flatten(), 'Predicted_Return': all_predicted.flatten()})
+    res_df.to_csv('gold_gru_return_result.csv', index=False)
+    print("예측 결과가 'gold_gru_return_result.csv'로 저장되었습니다.")
