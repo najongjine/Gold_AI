@@ -7,6 +7,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.preprocessing import StandardScaler
 import os
 
 # 1. 데이터 수집 (yfinance)
@@ -33,7 +34,11 @@ def preprocess_data(df, ma_window=60, horizon=60):
     # 2. 이동평균 모멘텀 (현재 MA / 이전 MA - 1) * 100
     df['MA_Momentum'] = (df['MA'] / df['MA'].shift(1) - 1) * 100
     
-    # 타겟 설정: 특정 시점 MA 대비 horizon일 후 MA의 변화율 (%)
+    # [주의] 데이터 누수(Data Leakage) 지점 1:
+    # 타겟 설정 시 horizon(60일) 후의 데이터를 가져옵니다.
+    # 즉, t시점의 y값은 t+60 시점의 정보를 포함하고 있습니다.
+    # 따라서 학습 데이터의 마지막 시점 t_last와 검증 데이터의 시작 시점 t_start 사이에 
+    # 최소 horizon만큼의 간격(Gap)이 없으면, 검증 데이터의 피처가 학습 데이터의 타겟에 쓰인 정보를 미리 알게 됩니다.
     df['Target_Return'] = (df['MA'].shift(-horizon) / df['MA'] - 1) * 100
     
     # 결측치 제거
@@ -47,9 +52,12 @@ def prepare_sequences(df, seq_len=120):
     features = df[['Disparity', 'MA_Momentum']].values
     target = df['Target_Return'].values.reshape(-1, 1)
     
-    # 이미 % 단위이므로 스케일링 없이 진행
+    # 시퀀스 생성
     X, y = [], []
     for i in range(len(features) - seq_len):
+        # [주의] 데이터 누수 지점 2:
+        # X[i]는 i ~ i+seq_len-1 범위의 피처를 사용합니다.
+        # y[i]는 i+seq_len 시점의 타겟(즉, i+seq_len+horizon까지의 정보)을 사용합니다.
         X.append(features[i:i+seq_len])
         y.append(target[i+seq_len])
         
@@ -91,11 +99,12 @@ if __name__ == "__main__":
     num_epochs = 50
     learning_rate = 0.001
     
-    # TimeSeriesSplit 설정
-    tscv = TimeSeriesSplit(n_splits=5)
+    # TimeSeriesSplit 설정 (gap 추가로 데이터 누수 방지)
+    # gap=horizon(60)을 설정하여 train 종료점과 test 시작점 사이에 미래 정보 중첩을 차단합니다.
+    tscv = TimeSeriesSplit(n_splits=5, gap=horizon)
     mae_list = []
     
-    print(f"\n수익률 예측 학습 및 검증을 시작합니다 (TimeSeriesSplit)...")
+    print(f"\n수익률 예측 학습 및 검증을 시작합니다 (TimeSeriesSplit with gap={horizon})...")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
@@ -104,14 +113,27 @@ if __name__ == "__main__":
     all_predicted = []
     
     for fold, (train_index, test_index) in enumerate(tscv.split(X)):
-        print(f"Fold {fold+1} 학습 중...")
+        print(f"Fold {fold+1} 학습 중 (Train: {len(train_index)}건, Test: {len(test_index)}건)...")
         
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
         
+        # [주의] 데이터 누수 지점 3: 스케일링
+        # Scaler는 오직 Train 데이터에만 fit해야 합니다. Validation 정보가 스케일링에 섞여선 안 됩니다.
+        scaler = StandardScaler()
+        
+        # 3D 데이터를 2D로 펼쳐서 스케일링 (batch * seq_len, features)
+        N_train, L, F = X_train.shape
+        X_train_reshaped = X_train.reshape(-1, F)
+        X_train_scaled = scaler.fit_transform(X_train_reshaped).reshape(N_train, L, F)
+        
+        N_test, L, F = X_test.shape
+        X_test_reshaped = X_test.reshape(-1, F)
+        X_test_scaled = scaler.transform(X_test_reshaped).reshape(N_test, L, F)
+        
         # DataLoader 생성
-        train_data = TensorDataset(torch.FloatTensor(X_train), torch.FloatTensor(y_train))
-        test_data = TensorDataset(torch.FloatTensor(X_test), torch.FloatTensor(y_test))
+        train_data = TensorDataset(torch.FloatTensor(X_train_scaled), torch.FloatTensor(y_train))
+        test_data = TensorDataset(torch.FloatTensor(X_test_scaled), torch.FloatTensor(y_test))
         
         train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=False)
         test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
