@@ -1,20 +1,31 @@
 gold_predict_gru.py 여기에
 이걸 적용해줘.
 ---------
-내 GRU 금가격 예측 코드에서 데이터 누수 가능성을 줄이고 싶어.
+내가 가진 파이썬 코드에서 GRU 입력 feature가 지금 너무 단순합니다.
 
-현재는 TimeSeriesSplit으로 교차검증하고 있는데,
-타겟이 "현재 시점 기준 60일 후 이동평균 수익률"이라서
-train과 validation 사이에 미래 정보가 겹칠 수 있어.
+현재 feature는 아래 2개입니다.
+- Disparity
+- MA_Momentum
 
-다음 조건으로 코드를 수정해줘.
+여기에 아래 4개 feature를 추가하고 싶습니다.
+- Return_1d  = (Close / Close.shift(1) - 1) * 100
+- Return_5d  = (Close / Close.shift(5) - 1) * 100
+- Return_20d = (Close / Close.shift(20) - 1) * 100
+- Return_60d = (Close / Close.shift(60) - 1) * 100
 
-1. 시계열 데이터이므로 랜덤 셔플 금지
-2. train과 validation 사이에 최소 60일 gap을 둘 것
-3. 현재 seq_len=120, horizon=60 기준으로 데이터 누수가 없도록 split을 수정할 것
-4. scaler를 쓴다면 train 데이터에만 fit하고 validation에는 transform만 할 것
-5. 전체 실행 가능한 완성형 코드로 보여줄 것
-6. 어디서 누수가 발생할 수 있었는지 주석으로 쉽게 설명할 것
+내 요구사항:
+1. 기존 코드 구조는 최대한 유지할 것
+2. preprocess_data() 안에서 위 수익률 feature들을 생성할 것
+3. prepare_sequences()에서 feature 목록을 기존 2개에서 6개로 변경할 것
+4. input_dim도 자동으로 맞게 수정할 것
+5. 기존 타겟(Target_Return)은 그대로 유지할 것
+6. 데이터 누수(leakage)는 만들지 말 것
+7. 결측치 처리(dropna)는 새 feature 추가 후에도 정상 동작하게 할 것
+8. 전체 실행 가능한 완성 코드로 다시 작성할 것
+9. 수정된 부분에는 주석으로 "추가 feature"라고 표시할 것
 
-내 기존 코드 구조를 최대한 유지해서 수정해줘.
+출력 형식:
+- 설명 길게 하지 말고
+- 전체 실행 가능한 최종 코드만 출력
+- 중간 생략 없이 한 번에 완성본으로 출력
 -----------

@@ -34,6 +34,12 @@ def preprocess_data(df, ma_window=60, horizon=60):
     # 2. 이동평균 모멘텀 (현재 MA / 이전 MA - 1) * 100
     df['MA_Momentum'] = (df['MA'] / df['MA'].shift(1) - 1) * 100
     
+    # 추가 feature: 수익률 4종 생성
+    df['Return_1d']  = (df['Close'] / df['Close'].shift(1) - 1) * 100
+    df['Return_5d']  = (df['Close'] / df['Close'].shift(5) - 1) * 100
+    df['Return_20d'] = (df['Close'] / df['Close'].shift(20) - 1) * 100
+    df['Return_60d'] = (df['Close'] / df['Close'].shift(60) - 1) * 100
+    
     # [주의] 데이터 누수(Data Leakage) 지점 1:
     # 타겟 설정 시 horizon(60일) 후의 데이터를 가져옵니다.
     # 즉, t시점의 y값은 t+60 시점의 정보를 포함하고 있습니다.
@@ -48,8 +54,9 @@ def preprocess_data(df, ma_window=60, horizon=60):
 # 3. 데이터 시퀀스 변환 (스케일링 없음)
 def prepare_sequences(df, seq_len=120):
     print(f"데이터 시퀀스(길이: {seq_len})를 생성합니다 (스케일러 사용 안 함)...")
-    # 피처: 이격도와 MA 모멘텀
-    features = df[['Disparity', 'MA_Momentum']].values
+    # 추가 feature: 피처 목록을 2개에서 6개로 변경
+    feature_cols = ['Disparity', 'MA_Momentum', 'Return_1d', 'Return_5d', 'Return_20d', 'Return_60d']
+    features = df[feature_cols].values
     target = df['Target_Return'].values.reshape(-1, 1)
     
     # 시퀀스 생성
@@ -91,7 +98,8 @@ if __name__ == "__main__":
     X, y = prepare_sequences(df, seq_len=seq_len)
     
     # 모델 하이퍼파라미터
-    input_dim = 2
+    # 추가 feature: input_dim을 데이터프레임의 피처 수에 맞춰 자동으로 설정 (여기선 6)
+    input_dim = X.shape[2] 
     hidden_dim = 64
     layer_dim = 2
     output_dim = 1
@@ -101,7 +109,8 @@ if __name__ == "__main__":
     
     # TimeSeriesSplit 설정 (gap 추가로 데이터 누수 방지)
     # gap=horizon(60)을 설정하여 train 종료점과 test 시작점 사이에 미래 정보 중첩을 차단합니다.
-    tscv = TimeSeriesSplit(n_splits=5, gap=horizon)
+    effective_gap = seq_len + horizon - 1
+    tscv = TimeSeriesSplit(n_splits=5, gap=effective_gap)
     mae_list = []
     
     print(f"\n수익률 예측 학습 및 검증을 시작합니다 (TimeSeriesSplit with gap={horizon})...")
@@ -178,23 +187,25 @@ if __name__ == "__main__":
         if fold == 4:
             all_actual = fold_actuals
             all_predicted = fold_preds
-
-    print(f"\n평균 MAE (수익률): {np.mean(mae_list):.4f}%")
-
-    # 시각화 (마지막 Fold 기준)
-    plt.figure(figsize=(12, 6))
-    plt.plot(all_actual, label='Actual MA Return (%)', color='gray', alpha=0.6)
-    plt.plot(all_predicted, label='Predicted MA Return (%)', color='blue')
-    plt.axhline(0, color='red', linestyle='--', alpha=0.5)
-    plt.title(f'Gold Price MA Return Prediction (GRU) - Last Fold (MAE: {np.mean(mae_list):.4f}%)')
-    plt.xlabel('Days')
-    plt.ylabel('Return (%)')
-    plt.legend()
-    plt.grid(True)
-    plt.savefig('gold_gru_return_prediction.png')
-    print("예측 결과 그래프가 'gold_gru_return_prediction.png'로 저장되었습니다.")
     
-    # CSV 저장 (마지막 Fold 예측)
-    res_df = pd.DataFrame({'Actual_Return': all_actual.flatten(), 'Predicted_Return': all_predicted.flatten()})
-    res_df.to_csv('gold_gru_return_result.csv', index=False)
-    print("예측 결과가 'gold_gru_return_result.csv'로 저장되었습니다.")
+    if len(mae_list) > 0:
+        print(f"\n평균 MAE (수익률): {np.mean(mae_list):.4f}%")
+    
+    # 시각화 (마지막 Fold 기준)
+    if len(all_actual) > 0:
+        plt.figure(figsize=(12, 6))
+        plt.plot(all_actual, label='Actual MA Return (%)', color='gray', alpha=0.6)
+        plt.plot(all_predicted, label='Predicted MA Return (%)', color='blue')
+        plt.axhline(0, color='red', linestyle='--', alpha=0.5)
+        plt.title(f'Gold Price MA Return Prediction (GRU) - Last Fold (MAE: {np.mean(mae_list):.4f}%)')
+        plt.xlabel('Days')
+        plt.ylabel('Return (%)')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig('gold_gru_return_prediction.png')
+        print("예측 결과 그래프가 'gold_gru_return_prediction.png'로 저장되었습니다.")
+        
+        # CSV 저장 (마지막 Fold 예측)
+        res_df = pd.DataFrame({'Actual_Return': all_actual.flatten(), 'Predicted_Return': all_predicted.flatten()})
+        res_df.to_csv('gold_gru_return_result.csv', index=False)
+        print("예측 결과가 'gold_gru_return_result.csv'로 저장되었습니다.")
