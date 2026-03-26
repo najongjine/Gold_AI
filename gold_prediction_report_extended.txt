@@ -1,0 +1,79 @@
+[데이터 출처 및 입력 지표]
+- 수집 기간: 최근 10y
+- 수집 소스: yfinance
+- Gold: GC=F
+- Dollar_Index: DX-Y.NYB
+- US10Y_Treasury: ^TNX
+- TIPS_ETF: TIP
+- VIX: ^VIX
+- S&P500: ^GSPC
+- Oil: CL=F
+- Silver: SI=F
+- GLD: GLD
+
+[모델 및 타겟 정의]
+- 모델: LightGBM Regressor
+- 스무딩: 60거래일 이동평균
+- 예측 타겟: 향후 60거래일 뒤 Gold 60일 이동평균의 현재 대비 변화율(%)
+- 검증 방식: TimeSeriesSplit 5-fold (gap=60)
+- 확장 내용: 기존 거시지표 + GRU 코드의 연관자산/비율/모멘텀/달력 feature 통합
+
+[모델 학습 피처 수] 92개
+
+[검증 결과 요약]
+평균 MAE: 6.2247
+평균 RMSE: 7.4531
+평균 R2: -1.2916
+평균 방향성 적중률: 64.78%
+
+[Baseline Comparison]
+LightGBM Model: MAE=6.2247, RMSE=7.4531, R2=-1.2916, DirAcc=64.78%
+Always 0%: MAE=5.9915, RMSE=6.9599, R2=-1.1916, DirAcc=0.00%
+Last 60d Return: MAE=4.7504, RMSE=5.7907, R2=-0.4024, DirAcc=77.53%
+Baseline Model (Gold_disparity_smooth60): MAE=3.8847, RMSE=4.7478, R2=0.0107, DirAcc=79.38%
+
+[예측 방식 선택]
+- 교차검증 기준 최종 채택 방식: Baseline Model (Gold_disparity_smooth60)
+- 채택 방식 CV MAE: 3.8847
+- 참고: LightGBM이 baseline model보다 좋아야만 채택되는데, 조건을 통과하지 못해 baseline을 사용
+
+[신뢰도 판단]
+- 신뢰도: 매우 낮음
+- 판단 근거: 최근 1년에서도 오차가 커서 방향 참고용 이상으로 해석하면 위험합니다.
+
+[최근 1년 백테스트]
+- 구간: 2024-12-31 ~ 2025-12-29 (252개 샘플)
+LightGBM Model: MAE=7.0558, RMSE=8.3609, R2=-2.1341, DirAcc=100.00%
+Always 0%: MAE=12.8543, RMSE=13.6944, R2=-7.4080, DirAcc=0.00%
+Last 60d Return: MAE=6.0146, RMSE=7.1311, R2=-1.2799, DirAcc=95.24%
+Baseline Model (Gold_disparity_smooth60): MAE=7.4716, RMSE=8.5236, R2=-2.2572, DirAcc=92.46%
+
+[주요 피처 중요도 Top 20]
+Gold_disparity_smooth60: 368022.384279
+Gold_MACD_Line: 204663.744255
+Gold_to_Silver_Ratio: 169726.452865
+Gold_to_Dollar_Ratio: 154822.786225
+US10Y_Treasury_vol_60: 73529.698507
+Gold_ma20_ma60_gap: 61045.339950
+VIX_vol_60: 50440.529004
+TIPS_ETF_vol_60: 40857.282178
+Gold_smooth_ret_60: 27953.469483
+Gold_to_GLD_Ratio: 27676.198813
+Dollar_Index_vol_60: 24870.082038
+month: 21701.577103
+S&P500_vol_60: 21099.406499
+Oil_vol_60: 21009.981343
+Gold_vol_60: 15290.431094
+Gold_MACD_Signal: 15221.762060
+Silver_vol_60: 13259.036392
+Dollar_Index_ret_60: 10653.974776
+Gold_smooth_ret_20: 10644.721835
+S&P500_vol_20: 8584.891268
+
+[최신 시점 예측 결과]
+- 기준일: 2026-03-26
+- 사용 방식: Baseline Model (Gold_disparity_smooth60)
+- 현재 MA60: 4862.47
+- 예측 미래 MA60: 4426.00
+- 예측 변화율: -8.98%
+- 결론: 하락 추세 예상
