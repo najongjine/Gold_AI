@@ -23,7 +23,7 @@ NUM_SIMULATIONS = 1000
 # Use recent market behavior instead of full 10-year statistics.
 SIMULATION_WINDOW = 252
 COMPARISON_WINDOWS = [60, 120, 252]
-SIMULATION_METHODS = ["normal", "bootstrap"]
+SIMULATION_METHODS = ["normal", "bootstrap", "regime"]
 
 # Fix the random seed so the result is reproducible.
 RANDOM_SEED = 42
@@ -43,6 +43,10 @@ RSI_DRIFT_ADJUSTMENT = 0.0002
 MACD_DRIFT_SCALE = 0.05
 RETURN_20_DRIFT_SCALE = 0.03
 RETURN_60_DRIFT_SCALE = 0.02
+
+# Regime model settings
+REGIME_VOL_WINDOW = 20
+HIGH_VOL_QUANTILE = 0.65
 
 
 def configure_yfinance_cache():
@@ -245,6 +249,78 @@ def calculate_window_comparison(price_with_returns, windows):
     return comparison
 
 
+def build_regime_model(price_with_returns, mean_log_return):
+    """
+    Build a simple two-state regime model from recent returns.
+
+    States:
+    - low_vol: calmer market regime
+    - high_vol: stressed or fast-moving regime
+
+    The regime is identified from rolling volatility and simulated
+    later with a simple Markov transition matrix.
+    """
+    regime_df = price_with_returns[["Date", "Log_Return"]].copy()
+    regime_df["Rolling_Vol"] = regime_df["Log_Return"].rolling(REGIME_VOL_WINDOW).std()
+    regime_df = regime_df.dropna().reset_index(drop=True)
+
+    if regime_df.empty:
+        raise ValueError("Not enough data to build a regime model.")
+
+    vol_threshold = regime_df["Rolling_Vol"].quantile(HIGH_VOL_QUANTILE)
+    regime_df["Regime"] = np.where(regime_df["Rolling_Vol"] >= vol_threshold, "high_vol", "low_vol")
+
+    if regime_df["Regime"].nunique() < 2:
+        median_vol = regime_df["Rolling_Vol"].median()
+        regime_df["Regime"] = np.where(regime_df["Rolling_Vol"] >= median_vol, "high_vol", "low_vol")
+
+    regime_stats = {}
+    overall_mean = regime_df["Log_Return"].mean()
+
+    for regime_name in ["low_vol", "high_vol"]:
+        regime_returns = regime_df.loc[regime_df["Regime"] == regime_name, "Log_Return"]
+
+        if regime_returns.empty:
+            regime_stats[regime_name] = {
+                "mean": overall_mean,
+                "volatility": regime_df["Log_Return"].std(),
+                "count": 0,
+            }
+            continue
+
+        regime_stats[regime_name] = {
+            "mean": regime_returns.mean(),
+            "volatility": regime_returns.std(),
+            "count": len(regime_returns),
+        }
+
+    for regime_name in regime_stats:
+        if pd.isna(regime_stats[regime_name]["volatility"]) or regime_stats[regime_name]["volatility"] == 0:
+            regime_stats[regime_name]["volatility"] = regime_df["Log_Return"].std()
+
+    transitions = pd.crosstab(
+        regime_df["Regime"].shift(1),
+        regime_df["Regime"],
+        dropna=False,
+    ).reindex(index=["low_vol", "high_vol"], columns=["low_vol", "high_vol"], fill_value=0)
+
+    # Add a small smoothing term so no transition probability becomes exactly zero.
+    transitions = transitions + 1
+    transition_matrix = transitions.div(transitions.sum(axis=1), axis=0)
+
+    mean_adjustment = mean_log_return - overall_mean
+    current_regime = regime_df["Regime"].iloc[-1]
+
+    return {
+        "states": ["low_vol", "high_vol"],
+        "current_regime": current_regime,
+        "vol_threshold": vol_threshold,
+        "mean_adjustment": mean_adjustment,
+        "regime_stats": regime_stats,
+        "transition_matrix": transition_matrix.to_dict(orient="index"),
+    }
+
+
 def normal_mc(last_price, mean_log_return, volatility, days=60, simulations=1000):
     """
     Run a Monte Carlo simulation using a normal distribution.
@@ -294,6 +370,44 @@ def bootstrap_mc(last_price, mean_log_return, historical_log_returns, days=60, s
     return simulated_prices
 
 
+def regime_mc(last_price, regime_model, days=60, simulations=1000):
+    """
+    Run a Markov regime-switching Monte Carlo simulation.
+
+    Each day belongs to either a low-volatility or high-volatility state.
+    The next state is sampled from the transition probabilities estimated
+    from recent history, and returns are then drawn using that state's
+    mean and volatility.
+    """
+    np.random.seed(RANDOM_SEED)
+
+    transition_matrix = regime_model["transition_matrix"]
+    regime_stats = regime_model["regime_stats"]
+    mean_adjustment = regime_model["mean_adjustment"]
+    simulated_prices = np.zeros((days, simulations))
+
+    for sim in range(simulations):
+        prices = [last_price]
+        current_regime = regime_model["current_regime"]
+
+        for _ in range(days):
+            transition_probs = transition_matrix[current_regime]
+            next_regime = np.random.choice(
+                regime_model["states"],
+                p=[transition_probs["low_vol"], transition_probs["high_vol"]],
+            )
+            regime_mean = regime_stats[next_regime]["mean"] + mean_adjustment
+            regime_volatility = regime_stats[next_regime]["volatility"]
+            random_log_return = np.random.normal(loc=regime_mean, scale=regime_volatility)
+            next_price = prices[-1] * np.exp(random_log_return)
+            prices.append(next_price)
+            current_regime = next_regime
+
+        simulated_prices[:, sim] = prices[1:]
+
+    return simulated_prices
+
+
 def summarize_simulation(simulated_prices):
     """
     Calculate the mean path and percentile paths.
@@ -327,6 +441,7 @@ def plot_results(price_df, simulation_results):
     simulation_colors = {
         "normal": ("lightcoral", "red"),
         "bootstrap": ("skyblue", "navy"),
+        "regime": ("khaki", "darkorange"),
     }
 
     for idx, (method, result) in enumerate(simulation_results.items(), start=1):
@@ -383,6 +498,7 @@ def main():
     historical_log_returns = recent_stats["historical_log_returns"]
     last_price = price_with_returns["Close"].iloc[-1]
     mean_log_return, trend_snapshot = calculate_trend_adjusted_drift(price_df, base_mean_log_return)
+    regime_model = build_regime_model(price_with_returns.tail(SIMULATION_WINDOW + REGIME_VOL_WINDOW), mean_log_return)
 
     print(f"[2] Running Monte Carlo simulations... ({NUM_SIMULATIONS} runs each)")
     simulation_results = {}
@@ -421,6 +537,22 @@ def main():
             "p95_path": p95_path,
         }
 
+    if "regime" in SIMULATION_METHODS:
+        simulated_prices = regime_mc(
+            last_price=last_price,
+            regime_model=regime_model,
+            days=FUTURE_DAYS,
+            simulations=NUM_SIMULATIONS,
+        )
+        mean_path, p5_path, p50_path, p95_path = summarize_simulation(simulated_prices)
+        simulation_results["regime"] = {
+            "simulated_prices": simulated_prices,
+            "mean_path": mean_path,
+            "p5_path": p5_path,
+            "p50_path": p50_path,
+            "p95_path": p95_path,
+        }
+
     print("\n===== Gold Price Monte Carlo Simulation Result =====")
     print(f"Ticker: {TICKER}")
     print(f"Latest close price: ${last_price:.2f}")
@@ -452,6 +584,28 @@ def main():
             f"- {stats['window']:>3} days | mean log return: {stats['mean_log_return']:.6f} | "
             f"volatility: {stats['volatility']:.6f} ({stats['volatility'] * 100:.4f}%)"
         )
+
+    print("\nRegime model:")
+    print(
+        f"- Current regime: {regime_model['current_regime']} | "
+        f"rolling-vol threshold: {regime_model['vol_threshold']:.6f}"
+    )
+    for regime_name in regime_model["states"]:
+        stats = regime_model["regime_stats"][regime_name]
+        print(
+            f"- {regime_name}: mean {stats['mean'] + regime_model['mean_adjustment']:.6f} | "
+            f"volatility {stats['volatility']:.6f} | observations {stats['count']}"
+        )
+    print(
+        f"- Transition low_vol -> low_vol/high_vol: "
+        f"{regime_model['transition_matrix']['low_vol']['low_vol']:.3f} / "
+        f"{regime_model['transition_matrix']['low_vol']['high_vol']:.3f}"
+    )
+    print(
+        f"- Transition high_vol -> low_vol/high_vol: "
+        f"{regime_model['transition_matrix']['high_vol']['low_vol']:.3f} / "
+        f"{regime_model['transition_matrix']['high_vol']['high_vol']:.3f}"
+    )
 
     print("\nSimulation comparison:")
     for method, result in simulation_results.items():
