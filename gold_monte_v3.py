@@ -1,0 +1,472 @@
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import yfinance as yf
+
+
+# -----------------------------
+# Basic settings
+# -----------------------------
+# GC=F is a popular Yahoo Finance symbol for gold futures.
+TICKER = "GC=F"
+
+# Download the last 10 years of daily data.
+HISTORY_PERIOD = "10y"
+INTERVAL = "1d"
+
+# Simulate 60 future trading days, 1000 times.
+FUTURE_DAYS = 60
+NUM_SIMULATIONS = 1000
+
+# Use recent market behavior instead of full 10-year statistics.
+SIMULATION_WINDOW = 252
+COMPARISON_WINDOWS = [60, 120, 252]
+SIMULATION_METHODS = ["normal", "bootstrap"]
+
+# Fix the random seed so the result is reproducible.
+RANDOM_SEED = 42
+
+# Trend signal windows
+SHORT_MA_WINDOW = 5
+MID_MA_WINDOW = 20
+LONG_MA_WINDOW = 60
+RSI_WINDOW = 14
+SHORT_RETURN_WINDOW = 20
+LONG_RETURN_WINDOW = 60
+
+# Small coefficients so the model keeps randomness
+# while leaning slightly toward the current trend.
+MA_DRIFT_ADJUSTMENT = 0.0003
+RSI_DRIFT_ADJUSTMENT = 0.0002
+MACD_DRIFT_SCALE = 0.05
+RETURN_20_DRIFT_SCALE = 0.03
+RETURN_60_DRIFT_SCALE = 0.02
+
+
+def configure_yfinance_cache():
+    """
+    Configure a local cache folder for yfinance.
+    This helps avoid SQLite cache-path issues on some environments.
+    """
+    cache_dir = Path(__file__).resolve().parent / ".yfinance_cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    if hasattr(yf, "set_tz_cache_location"):
+        yf.set_tz_cache_location(str(cache_dir))
+
+
+def download_gold_data():
+    """
+    Download gold-related price data from yfinance.
+    Return a clean DataFrame with Date and Close columns.
+    """
+    print(f"[1] Downloading {TICKER} price data...")
+
+    df = pd.DataFrame()
+
+    try:
+        df = yf.download(
+            TICKER,
+            period=HISTORY_PERIOD,
+            interval=INTERVAL,
+            auto_adjust=False,
+            progress=False,
+            threads=False,
+        )
+    except Exception:
+        df = pd.DataFrame()
+
+    if df.empty:
+        try:
+            ticker = yf.Ticker(TICKER)
+            df = ticker.history(period=HISTORY_PERIOD, interval=INTERVAL, auto_adjust=False)
+        except Exception:
+            df = pd.DataFrame()
+
+    if df.empty:
+        raise ValueError("Failed to download data. Check your internet connection or ticker symbol.")
+
+    if isinstance(df.columns, pd.MultiIndex):
+        if ("Close", TICKER) in df.columns:
+            close_series = df[("Close", TICKER)]
+        elif ("Adj Close", TICKER) in df.columns:
+            close_series = df[("Adj Close", TICKER)]
+        else:
+            raise KeyError("Could not find a Close column.")
+    else:
+        if "Close" in df.columns:
+            close_series = df["Close"]
+        elif "Adj Close" in df.columns:
+            close_series = df["Adj Close"]
+        else:
+            raise KeyError("Could not find a Close column.")
+
+    price_df = pd.DataFrame({"Close": pd.to_numeric(close_series, errors="coerce")})
+    price_df = price_df.reset_index()
+
+    first_col = price_df.columns[0]
+    if first_col != "Date":
+        price_df = price_df.rename(columns={first_col: "Date"})
+
+    price_df = price_df.dropna(subset=["Date", "Close"])
+    price_df["Date"] = pd.to_datetime(price_df["Date"])
+    price_df = price_df.sort_values("Date").reset_index(drop=True)
+
+    return price_df
+
+
+def calculate_daily_returns(price_df):
+    """
+    Calculate daily log returns from closing prices.
+    Formula:
+        ln(today's close / yesterday's close)
+    """
+    price_df = price_df.copy()
+    price_df["Log_Return"] = np.log(price_df["Close"] / price_df["Close"].shift(1))
+    price_df = price_df.dropna().reset_index(drop=True)
+    return price_df
+
+
+def calculate_trend_indicators(price_df):
+    """
+    Calculate simple trend and momentum indicators from closing prices.
+    These signals are later used to slightly adjust the Monte Carlo drift.
+    """
+    df = price_df.copy()
+
+    df["MA5"] = df["Close"].rolling(SHORT_MA_WINDOW).mean()
+    df["MA20"] = df["Close"].rolling(MID_MA_WINDOW).mean()
+    df["MA60"] = df["Close"].rolling(LONG_MA_WINDOW).mean()
+
+    delta = df["Close"].diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+    avg_gain = gain.rolling(RSI_WINDOW).mean()
+    avg_loss = loss.rolling(RSI_WINDOW).mean()
+    rs = avg_gain / avg_loss.replace(0, np.nan)
+    df["RSI"] = 100 - (100 / (1 + rs))
+    df["RSI"] = df["RSI"].fillna(50)
+
+    ema12 = df["Close"].ewm(span=12, adjust=False).mean()
+    ema26 = df["Close"].ewm(span=26, adjust=False).mean()
+    df["MACD_Momentum"] = (ema12 - ema26) / df["Close"]
+
+    df["Return_20D"] = df["Close"] / df["Close"].shift(SHORT_RETURN_WINDOW) - 1
+    df["Return_60D"] = df["Close"] / df["Close"].shift(LONG_RETURN_WINDOW) - 1
+
+    return df
+
+
+def calculate_trend_adjusted_drift(price_df, base_mean_log_return):
+    """
+    Start from the recent average log return and add small adjustments
+    from moving-average trend, RSI, MACD-like momentum, and recent returns.
+    """
+    indicators_df = calculate_trend_indicators(price_df)
+    latest = indicators_df.iloc[-1]
+
+    drift_adjustment = 0.0
+
+    if pd.notna(latest["MA20"]) and pd.notna(latest["MA60"]):
+        if latest["MA20"] > latest["MA60"]:
+            drift_adjustment += MA_DRIFT_ADJUSTMENT
+        elif latest["MA20"] < latest["MA60"]:
+            drift_adjustment -= MA_DRIFT_ADJUSTMENT
+
+    if pd.notna(latest["MA5"]) and pd.notna(latest["MA20"]):
+        if latest["MA5"] > latest["MA20"]:
+            drift_adjustment += MA_DRIFT_ADJUSTMENT / 2
+        elif latest["MA5"] < latest["MA20"]:
+            drift_adjustment -= MA_DRIFT_ADJUSTMENT / 2
+
+    if latest["RSI"] >= 70:
+        drift_adjustment -= RSI_DRIFT_ADJUSTMENT
+    elif latest["RSI"] <= 30:
+        drift_adjustment += RSI_DRIFT_ADJUSTMENT
+
+    if pd.notna(latest["MACD_Momentum"]):
+        drift_adjustment += latest["MACD_Momentum"] * MACD_DRIFT_SCALE
+
+    if pd.notna(latest["Return_20D"]):
+        drift_adjustment += latest["Return_20D"] * RETURN_20_DRIFT_SCALE / SHORT_RETURN_WINDOW
+
+    if pd.notna(latest["Return_60D"]):
+        drift_adjustment += latest["Return_60D"] * RETURN_60_DRIFT_SCALE / LONG_RETURN_WINDOW
+
+    adjusted_drift = base_mean_log_return + drift_adjustment
+
+    trend_snapshot = {
+        "MA5": latest["MA5"],
+        "MA20": latest["MA20"],
+        "MA60": latest["MA60"],
+        "RSI": latest["RSI"],
+        "MACD_Momentum": latest["MACD_Momentum"],
+        "Return_20D": latest["Return_20D"],
+        "Return_60D": latest["Return_60D"],
+        "base_mean_log_return": base_mean_log_return,
+        "drift_adjustment": drift_adjustment,
+        "adjusted_drift": adjusted_drift,
+    }
+
+    return adjusted_drift, trend_snapshot
+
+
+def calculate_recent_statistics(price_with_returns, window):
+    """
+    Calculate mean log return and volatility from a recent window.
+    If the requested window is longer than the available data,
+    use all available rows.
+    """
+    recent_data = price_with_returns.tail(window).copy()
+
+    if recent_data.empty:
+        raise ValueError("Not enough return data to calculate recent statistics.")
+
+    return {
+        "window": len(recent_data),
+        "mean_log_return": recent_data["Log_Return"].mean(),
+        "volatility": recent_data["Log_Return"].std(),
+        "historical_log_returns": recent_data["Log_Return"].to_numpy(),
+    }
+
+
+def calculate_window_comparison(price_with_returns, windows):
+    """
+    Build comparable statistics for multiple recent windows.
+    """
+    comparison = []
+
+    for window in windows:
+        stats = calculate_recent_statistics(price_with_returns, window)
+        comparison.append(stats)
+
+    return comparison
+
+
+def normal_mc(last_price, mean_log_return, volatility, days=60, simulations=1000):
+    """
+    Run a Monte Carlo simulation using a normal distribution.
+    """
+    np.random.seed(RANDOM_SEED)
+    simulated_prices = np.zeros((days, simulations))
+
+    for sim in range(simulations):
+        prices = [last_price]
+
+        for _ in range(days):
+            random_log_return = np.random.normal(loc=mean_log_return, scale=volatility)
+            next_price = prices[-1] * np.exp(random_log_return)
+            prices.append(next_price)
+
+        simulated_prices[:, sim] = prices[1:]
+
+    return simulated_prices
+
+
+def bootstrap_mc(last_price, mean_log_return, historical_log_returns, days=60, simulations=1000):
+    """
+    Run a Monte Carlo simulation using historical bootstrap.
+
+    Real historical daily returns are resampled with replacement so
+    skewness and fat tails remain closer to the observed market data.
+    """
+    np.random.seed(RANDOM_SEED)
+
+    if len(historical_log_returns) == 0:
+        raise ValueError("Historical log return pool is empty.")
+
+    bootstrap_shift = mean_log_return - np.mean(historical_log_returns)
+    simulated_prices = np.zeros((days, simulations))
+
+    for sim in range(simulations):
+        prices = [last_price]
+
+        for _ in range(days):
+            sampled_log_return = np.random.choice(historical_log_returns)
+            random_log_return = sampled_log_return + bootstrap_shift
+            next_price = prices[-1] * np.exp(random_log_return)
+            prices.append(next_price)
+
+        simulated_prices[:, sim] = prices[1:]
+
+    return simulated_prices
+
+
+def summarize_simulation(simulated_prices):
+    """
+    Calculate the mean path and percentile paths.
+    """
+    mean_path = simulated_prices.mean(axis=1)
+    p5_path = np.percentile(simulated_prices, 5, axis=1)
+    p50_path = np.percentile(simulated_prices, 50, axis=1)
+    p95_path = np.percentile(simulated_prices, 95, axis=1)
+
+    return mean_path, p5_path, p50_path, p95_path
+
+
+def plot_results(price_df, simulation_results):
+    """
+    Visualize historical prices and simulation results.
+    """
+    plt.style.use("seaborn-v0_8-whitegrid")
+    fig, axes = plt.subplots(1 + len(simulation_results), 1, figsize=(14, 6 + 4 * len(simulation_results)))
+
+    if len(simulation_results) == 0:
+        raise ValueError("No simulation results to plot.")
+
+    axes = np.atleast_1d(axes)
+
+    axes[0].plot(price_df["Date"], price_df["Close"], color="goldenrod", linewidth=2)
+    axes[0].set_title(f"{TICKER} Closing Price - Last 10 Years", fontsize=14)
+    axes[0].set_xlabel("Date")
+    axes[0].set_ylabel("Price (USD)")
+
+    future_x = np.arange(1, FUTURE_DAYS + 1)
+    simulation_colors = {
+        "normal": ("lightcoral", "red"),
+        "bootstrap": ("skyblue", "navy"),
+    }
+
+    for idx, (method, result) in enumerate(simulation_results.items(), start=1):
+        path_color, mean_color = simulation_colors.get(method, ("lightgray", "black"))
+
+        axes[idx].plot(future_x, result["simulated_prices"], color=path_color, alpha=0.03)
+        axes[idx].plot(future_x, result["mean_path"], color=mean_color, linewidth=2, label="Mean Path")
+        axes[idx].plot(
+            future_x,
+            result["p5_path"],
+            color="green",
+            linestyle="--",
+            linewidth=2,
+            label="5th Percentile",
+        )
+        axes[idx].plot(
+            future_x,
+            result["p50_path"],
+            color="blue",
+            linestyle="-.",
+            linewidth=2,
+            label="50th Percentile",
+        )
+        axes[idx].plot(
+            future_x,
+            result["p95_path"],
+            color="purple",
+            linestyle="--",
+            linewidth=2,
+            label="95th Percentile",
+        )
+        axes[idx].set_title(
+            f"{TICKER} {method.capitalize()} Monte Carlo for Next {FUTURE_DAYS} Trading Days ({NUM_SIMULATIONS} runs)",
+            fontsize=14,
+        )
+        axes[idx].set_xlabel("Future Trading Day")
+        axes[idx].set_ylabel("Simulated Price (USD)")
+        axes[idx].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+
+def main():
+    configure_yfinance_cache()
+
+    price_df = download_gold_data()
+    price_with_returns = calculate_daily_returns(price_df)
+
+    recent_stats = calculate_recent_statistics(price_with_returns, SIMULATION_WINDOW)
+    comparison_stats = calculate_window_comparison(price_with_returns, COMPARISON_WINDOWS)
+    base_mean_log_return = recent_stats["mean_log_return"]
+    volatility = recent_stats["volatility"]
+    historical_log_returns = recent_stats["historical_log_returns"]
+    last_price = price_with_returns["Close"].iloc[-1]
+    mean_log_return, trend_snapshot = calculate_trend_adjusted_drift(price_df, base_mean_log_return)
+
+    print(f"[2] Running Monte Carlo simulations... ({NUM_SIMULATIONS} runs each)")
+    simulation_results = {}
+
+    if "normal" in SIMULATION_METHODS:
+        simulated_prices = normal_mc(
+            last_price=last_price,
+            mean_log_return=mean_log_return,
+            volatility=volatility,
+            days=FUTURE_DAYS,
+            simulations=NUM_SIMULATIONS,
+        )
+        mean_path, p5_path, p50_path, p95_path = summarize_simulation(simulated_prices)
+        simulation_results["normal"] = {
+            "simulated_prices": simulated_prices,
+            "mean_path": mean_path,
+            "p5_path": p5_path,
+            "p50_path": p50_path,
+            "p95_path": p95_path,
+        }
+
+    if "bootstrap" in SIMULATION_METHODS:
+        simulated_prices = bootstrap_mc(
+            last_price=last_price,
+            mean_log_return=mean_log_return,
+            historical_log_returns=historical_log_returns,
+            days=FUTURE_DAYS,
+            simulations=NUM_SIMULATIONS,
+        )
+        mean_path, p5_path, p50_path, p95_path = summarize_simulation(simulated_prices)
+        simulation_results["bootstrap"] = {
+            "simulated_prices": simulated_prices,
+            "mean_path": mean_path,
+            "p5_path": p5_path,
+            "p50_path": p50_path,
+            "p95_path": p95_path,
+        }
+
+    print("\n===== Gold Price Monte Carlo Simulation Result =====")
+    print(f"Ticker: {TICKER}")
+    print(f"Latest close price: ${last_price:.2f}")
+    print(f"Simulation statistics window: recent {recent_stats['window']} trading days")
+    print(f"Simulation methods: {', '.join(SIMULATION_METHODS)}")
+    print(f"Base average daily log return: {base_mean_log_return:.6f}")
+    print(f"Trend-adjusted daily drift: {mean_log_return:.6f}")
+    print(f"Drift adjustment from trend signals: {trend_snapshot['drift_adjustment']:.6f}")
+    print(f"Daily volatility: {volatility:.6f} ({volatility * 100:.4f}%)")
+
+    print("\nTrend indicators:")
+    print(
+        f"- MA5: ${trend_snapshot['MA5']:.2f} | "
+        f"MA20: ${trend_snapshot['MA20']:.2f} | "
+        f"MA60: ${trend_snapshot['MA60']:.2f}"
+    )
+    print(
+        f"- RSI({RSI_WINDOW}): {trend_snapshot['RSI']:.2f} | "
+        f"MACD-like momentum: {trend_snapshot['MACD_Momentum']:.6f}"
+    )
+    print(
+        f"- Recent 20-day return: {trend_snapshot['Return_20D'] * 100:.2f}% | "
+        f"Recent 60-day return: {trend_snapshot['Return_60D'] * 100:.2f}%"
+    )
+
+    print("\nRecent window comparison:")
+    for stats in comparison_stats:
+        print(
+            f"- {stats['window']:>3} days | mean log return: {stats['mean_log_return']:.6f} | "
+            f"volatility: {stats['volatility']:.6f} ({stats['volatility'] * 100:.4f}%)"
+        )
+
+    print("\nSimulation comparison:")
+    for method, result in simulation_results.items():
+        print(f"{method.capitalize()} Monte Carlo:")
+        print(f"Expected mean price after {FUTURE_DAYS} days: ${result['mean_path'][-1]:.2f}")
+        print(f"5th percentile after {FUTURE_DAYS} days: ${result['p5_path'][-1]:.2f}")
+        print(f"50th percentile after {FUTURE_DAYS} days: ${result['p50_path'][-1]:.2f}")
+        print(f"95th percentile after {FUTURE_DAYS} days: ${result['p95_path'][-1]:.2f}")
+        print(
+            f"Expected price range after {FUTURE_DAYS} days (5% to 95%): "
+            f"${result['p5_path'][-1]:.2f} ~ ${result['p95_path'][-1]:.2f}"
+        )
+
+    plot_results(price_df, simulation_results)
+
+
+if __name__ == "__main__":
+    main()
