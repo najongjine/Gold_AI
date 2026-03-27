@@ -20,6 +20,10 @@ INTERVAL = "1d"
 FUTURE_DAYS = 60
 NUM_SIMULATIONS = 1000
 
+# Use recent market behavior instead of full 10-year statistics.
+SIMULATION_WINDOW = 252
+COMPARISON_WINDOWS = [60, 120, 252]
+
 # Fix the random seed so the result is reproducible.
 RANDOM_SEED = 42
 
@@ -110,25 +114,56 @@ def download_gold_data():
 
 def calculate_daily_returns(price_df):
     """
-    Calculate daily returns from closing prices.
+    Calculate daily log returns from closing prices.
     Formula:
-        today's close / yesterday's close - 1
+        ln(today's close / yesterday's close)
     """
     price_df = price_df.copy()
-    price_df["Daily_Return"] = price_df["Close"].pct_change()
+    price_df["Log_Return"] = np.log(price_df["Close"] / price_df["Close"].shift(1))
     price_df = price_df.dropna().reset_index(drop=True)
     return price_df
 
 
-def run_monte_carlo(last_price, mean_return, volatility, days=60, simulations=1000):
+def calculate_recent_statistics(price_with_returns, window):
+    """
+    Calculate mean log return and volatility from a recent window.
+    If the requested window is longer than the available data,
+    use all available rows.
+    """
+    recent_data = price_with_returns.tail(window).copy()
+
+    if recent_data.empty:
+        raise ValueError("Not enough return data to calculate recent statistics.")
+
+    return {
+        "window": len(recent_data),
+        "mean_log_return": recent_data["Log_Return"].mean(),
+        "volatility": recent_data["Log_Return"].std(),
+    }
+
+
+def calculate_window_comparison(price_with_returns, windows):
+    """
+    Build comparable statistics for multiple recent windows.
+    """
+    comparison = []
+
+    for window in windows:
+        stats = calculate_recent_statistics(price_with_returns, window)
+        comparison.append(stats)
+
+    return comparison
+
+
+def run_monte_carlo(last_price, mean_log_return, volatility, days=60, simulations=1000):
     """
     Run a simple Monte Carlo simulation.
 
     Idea:
-    - Measure historical daily mean return and volatility
-    - Assume future daily returns behave similarly
-    - Draw random daily returns from a normal distribution
-    - Update price with: next_price = current_price * (1 + daily_return)
+    - Measure historical daily mean log return and volatility
+    - Assume future daily log returns behave similarly
+    - Draw random daily log returns from a normal distribution
+    - Update price with: next_price = current_price * exp(daily_log_return)
     """
     np.random.seed(RANDOM_SEED)
 
@@ -141,13 +176,9 @@ def run_monte_carlo(last_price, mean_return, volatility, days=60, simulations=10
         prices = [last_price]
 
         for _ in range(days):
-            # Create one random daily return.
-            random_return = np.random.normal(loc=mean_return, scale=volatility)
-
-            # Prevent impossible price moves below -100%.
-            random_return = max(random_return, -0.99)
-
-            next_price = prices[-1] * (1 + random_return)
+            # Create one random daily log return.
+            random_log_return = np.random.normal(loc=mean_log_return, scale=volatility)
+            next_price = prices[-1] * np.exp(random_log_return)
             prices.append(next_price)
 
         # Skip the first value because it is the current price.
@@ -215,16 +246,18 @@ def main():
     # 2. Calculate daily returns
     price_with_returns = calculate_daily_returns(price_df)
 
-    # 3. Calculate historical statistics
-    mean_return = price_with_returns["Daily_Return"].mean()
-    volatility = price_with_returns["Daily_Return"].std()
+    # 3. Calculate recent-window statistics
+    recent_stats = calculate_recent_statistics(price_with_returns, SIMULATION_WINDOW)
+    comparison_stats = calculate_window_comparison(price_with_returns, COMPARISON_WINDOWS)
+    mean_log_return = recent_stats["mean_log_return"]
+    volatility = recent_stats["volatility"]
     last_price = price_with_returns["Close"].iloc[-1]
 
     # 4. Run simulation
     print(f"[2] Running Monte Carlo simulation... ({NUM_SIMULATIONS} runs)")
     simulated_prices = run_monte_carlo(
         last_price=last_price,
-        mean_return=mean_return,
+        mean_log_return=mean_log_return,
         volatility=volatility,
         days=FUTURE_DAYS,
         simulations=NUM_SIMULATIONS,
@@ -237,8 +270,15 @@ def main():
     print("\n===== Gold Price Monte Carlo Simulation Result =====")
     print(f"Ticker: {TICKER}")
     print(f"Latest close price: ${last_price:.2f}")
-    print(f"Average daily return: {mean_return:.6f} ({mean_return * 100:.4f}%)")
+    print(f"Simulation statistics window: recent {recent_stats['window']} trading days")
+    print(f"Average daily log return: {mean_log_return:.6f}")
     print(f"Daily volatility: {volatility:.6f} ({volatility * 100:.4f}%)")
+    print("\nRecent window comparison:")
+    for stats in comparison_stats:
+        print(
+            f"- {stats['window']:>3} days | mean log return: {stats['mean_log_return']:.6f} | "
+            f"volatility: {stats['volatility']:.6f} ({stats['volatility'] * 100:.4f}%)"
+        )
     print(f"Expected mean price after {FUTURE_DAYS} days: ${mean_path[-1]:.2f}")
     print(f"5th percentile after {FUTURE_DAYS} days: ${p5_path[-1]:.2f}")
     print(f"50th percentile after {FUTURE_DAYS} days: ${p50_path[-1]:.2f}")
