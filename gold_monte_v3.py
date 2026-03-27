@@ -44,33 +44,6 @@ MACD_DRIFT_SCALE = 0.05
 RETURN_20_DRIFT_SCALE = 0.03
 RETURN_60_DRIFT_SCALE = 0.02
 
-# Exogenous variable settings
-EXOGENOUS_WINDOW = 20
-FRED_SERIES = {
-    "DGS10": "Treasury_10Y",
-    "DFII10": "Real_Rate_10Y",
-    "CPIAUCSL": "CPI",
-}
-YF_EXOGENOUS_TICKERS = {
-    "DX-Y.NYB": "Dollar_Index",
-    "^VIX": "VIX",
-    "SPY": "SPY",
-    "CL=F": "Crude_Oil",
-    "GLD": "GLD",
-    "TLT": "TLT",
-}
-
-# Small drift adjustments from macro and cross-asset signals.
-DOLLAR_DRIFT_SCALE = 0.10
-REAL_RATE_DRIFT_SCALE = 0.12
-RATE_DRIFT_SCALE = 0.05
-VIX_DRIFT_SCALE = 0.03
-SPY_DRIFT_SCALE = 0.04
-OIL_DRIFT_SCALE = 0.02
-GLD_DRIFT_SCALE = 0.05
-TLT_DRIFT_SCALE = 0.03
-INFLATION_DRIFT_SCALE = 0.02
-
 # Regime model settings
 REGIME_VOL_WINDOW = 20
 HIGH_VOL_QUANTILE = 0.65
@@ -146,115 +119,6 @@ def download_gold_data():
     price_df = price_df.sort_values("Date").reset_index(drop=True)
 
     return price_df
-
-
-def download_yfinance_close_series(tickers, period=HISTORY_PERIOD, interval=INTERVAL):
-    """
-    Download multiple close-price series from yfinance and align them by date.
-    """
-    if not tickers:
-        return pd.DataFrame()
-
-    try:
-        df = yf.download(
-            list(tickers),
-            period=period,
-            interval=interval,
-            auto_adjust=False,
-            progress=False,
-            threads=False,
-        )
-    except Exception:
-        return pd.DataFrame()
-
-    if df.empty:
-        return pd.DataFrame()
-
-    if isinstance(df.columns, pd.MultiIndex):
-        if "Close" in df.columns.get_level_values(0):
-            close_df = df["Close"].copy()
-        elif "Adj Close" in df.columns.get_level_values(0):
-            close_df = df["Adj Close"].copy()
-        else:
-            return pd.DataFrame()
-    else:
-        close_col = "Close" if "Close" in df.columns else "Adj Close"
-        if close_col not in df.columns:
-            return pd.DataFrame()
-        close_df = df[[close_col]].copy()
-        close_df.columns = [list(tickers)[0]]
-
-    close_df = close_df.apply(pd.to_numeric, errors="coerce")
-    close_df = close_df.reset_index()
-    first_col = close_df.columns[0]
-    if first_col != "Date":
-        close_df = close_df.rename(columns={first_col: "Date"})
-
-    renamed_columns = {"Date": "Date"}
-    for ticker, alias in tickers.items():
-        if ticker in close_df.columns:
-            renamed_columns[ticker] = alias
-
-    close_df = close_df.rename(columns=renamed_columns)
-    close_df["Date"] = pd.to_datetime(close_df["Date"])
-    close_df = close_df.sort_values("Date").reset_index(drop=True)
-    return close_df
-
-
-def download_fred_series(series_map):
-    """
-    Download FRED series via the public CSV endpoint.
-
-    This avoids requiring an API key while still letting the model
-    use macro variables as drift-adjustment inputs.
-    """
-    fred_frames = []
-
-    for series_id, alias in series_map.items():
-        url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
-        try:
-            series_df = pd.read_csv(url)
-        except Exception:
-            continue
-
-        if series_df.empty or "DATE" not in series_df.columns or series_id not in series_df.columns:
-            continue
-
-        series_df = series_df.rename(columns={"DATE": "Date", series_id: alias})
-        series_df["Date"] = pd.to_datetime(series_df["Date"], errors="coerce")
-        series_df[alias] = pd.to_numeric(series_df[alias], errors="coerce")
-        series_df = series_df.dropna(subset=["Date"]).sort_values("Date").reset_index(drop=True)
-        fred_frames.append(series_df[["Date", alias]])
-
-    if not fred_frames:
-        return pd.DataFrame()
-
-    fred_df = fred_frames[0]
-    for frame in fred_frames[1:]:
-        fred_df = fred_df.merge(frame, on="Date", how="outer")
-
-    fred_df = fred_df.sort_values("Date").reset_index(drop=True)
-    return fred_df
-
-
-def build_exogenous_feature_set(price_df):
-    """
-    Build a merged daily feature table from market and macro series.
-    """
-    market_df = download_yfinance_close_series(YF_EXOGENOUS_TICKERS)
-    fred_df = download_fred_series(FRED_SERIES)
-
-    feature_df = price_df[["Date", "Close"]].copy()
-
-    if not market_df.empty:
-        feature_df = feature_df.merge(market_df, on="Date", how="left")
-    if not fred_df.empty:
-        feature_df = feature_df.merge(fred_df, on="Date", how="left")
-
-    feature_df = feature_df.sort_values("Date").reset_index(drop=True)
-    feature_df = feature_df.ffill()
-
-    return feature_df
 
 
 def calculate_daily_returns(price_df):
@@ -351,88 +215,6 @@ def calculate_trend_adjusted_drift(price_df, base_mean_log_return):
     }
 
     return adjusted_drift, trend_snapshot
-
-
-def safe_window_return(series, window=EXOGENOUS_WINDOW):
-    """
-    Return a simple percentage change over the given window if possible.
-    """
-    valid = pd.to_numeric(series, errors="coerce").dropna()
-    if len(valid) <= window:
-        return np.nan
-    start_value = valid.iloc[-window - 1]
-    end_value = valid.iloc[-1]
-    if start_value == 0 or pd.isna(start_value) or pd.isna(end_value):
-        return np.nan
-    return end_value / start_value - 1
-
-
-def safe_window_change(series, window=EXOGENOUS_WINDOW):
-    """
-    Return a simple arithmetic change over the given window if possible.
-    """
-    valid = pd.to_numeric(series, errors="coerce").dropna()
-    if len(valid) <= window:
-        return np.nan
-    return valid.iloc[-1] - valid.iloc[-window - 1]
-
-
-def calculate_exogenous_drift_adjustment(feature_df):
-    """
-    Use macro and cross-asset variables to gently adjust gold drift.
-
-    Heuristics:
-    - Dollar weakness tends to support gold.
-    - Higher nominal and real yields tend to pressure gold.
-    - Higher risk aversion can support gold.
-    - Oil, GLD, TLT, and inflation changes are used as softer side signals.
-    """
-    drift_adjustment = 0.0
-    snapshot = {}
-
-    signal_map = {
-        "Dollar_Index_20D": safe_window_return(feature_df.get("Dollar_Index", pd.Series(dtype=float))),
-        "VIX_20D": safe_window_return(feature_df.get("VIX", pd.Series(dtype=float))),
-        "SPY_20D": safe_window_return(feature_df.get("SPY", pd.Series(dtype=float))),
-        "Crude_Oil_20D": safe_window_return(feature_df.get("Crude_Oil", pd.Series(dtype=float))),
-        "GLD_20D": safe_window_return(feature_df.get("GLD", pd.Series(dtype=float))),
-        "TLT_20D": safe_window_return(feature_df.get("TLT", pd.Series(dtype=float))),
-        "Treasury_10Y_20D_Change": safe_window_change(feature_df.get("Treasury_10Y", pd.Series(dtype=float))),
-        "Real_Rate_10Y_20D_Change": safe_window_change(feature_df.get("Real_Rate_10Y", pd.Series(dtype=float))),
-        "CPI_20D_Change": safe_window_change(feature_df.get("CPI", pd.Series(dtype=float))),
-    }
-
-    if pd.notna(signal_map["Dollar_Index_20D"]):
-        drift_adjustment -= signal_map["Dollar_Index_20D"] * DOLLAR_DRIFT_SCALE
-    if pd.notna(signal_map["Real_Rate_10Y_20D_Change"]):
-        drift_adjustment -= signal_map["Real_Rate_10Y_20D_Change"] * REAL_RATE_DRIFT_SCALE
-    if pd.notna(signal_map["Treasury_10Y_20D_Change"]):
-        drift_adjustment -= signal_map["Treasury_10Y_20D_Change"] * RATE_DRIFT_SCALE
-    if pd.notna(signal_map["VIX_20D"]):
-        drift_adjustment += signal_map["VIX_20D"] * VIX_DRIFT_SCALE
-    if pd.notna(signal_map["SPY_20D"]):
-        drift_adjustment -= signal_map["SPY_20D"] * SPY_DRIFT_SCALE
-    if pd.notna(signal_map["Crude_Oil_20D"]):
-        drift_adjustment += signal_map["Crude_Oil_20D"] * OIL_DRIFT_SCALE
-    if pd.notna(signal_map["GLD_20D"]):
-        drift_adjustment += signal_map["GLD_20D"] * GLD_DRIFT_SCALE
-    if pd.notna(signal_map["TLT_20D"]):
-        drift_adjustment += signal_map["TLT_20D"] * TLT_DRIFT_SCALE
-    if pd.notna(signal_map["CPI_20D_Change"]):
-        drift_adjustment += signal_map["CPI_20D_Change"] * INFLATION_DRIFT_SCALE
-
-    latest_row = feature_df.iloc[-1] if not feature_df.empty else pd.Series(dtype=float)
-    snapshot.update(signal_map)
-    snapshot["latest_dollar_index"] = latest_row.get("Dollar_Index", np.nan)
-    snapshot["latest_vix"] = latest_row.get("VIX", np.nan)
-    snapshot["latest_spy"] = latest_row.get("SPY", np.nan)
-    snapshot["latest_crude_oil"] = latest_row.get("Crude_Oil", np.nan)
-    snapshot["latest_treasury_10y"] = latest_row.get("Treasury_10Y", np.nan)
-    snapshot["latest_real_rate_10y"] = latest_row.get("Real_Rate_10Y", np.nan)
-    snapshot["latest_cpi"] = latest_row.get("CPI", np.nan)
-    snapshot["drift_adjustment"] = drift_adjustment
-
-    return drift_adjustment, snapshot
 
 
 def calculate_recent_statistics(price_with_returns, window):
@@ -707,7 +489,6 @@ def main():
     configure_yfinance_cache()
 
     price_df = download_gold_data()
-    exogenous_df = build_exogenous_feature_set(price_df)
     price_with_returns = calculate_daily_returns(price_df)
 
     recent_stats = calculate_recent_statistics(price_with_returns, SIMULATION_WINDOW)
@@ -716,9 +497,7 @@ def main():
     volatility = recent_stats["volatility"]
     historical_log_returns = recent_stats["historical_log_returns"]
     last_price = price_with_returns["Close"].iloc[-1]
-    trend_adjusted_drift, trend_snapshot = calculate_trend_adjusted_drift(price_df, base_mean_log_return)
-    exogenous_drift_adjustment, exogenous_snapshot = calculate_exogenous_drift_adjustment(exogenous_df)
-    mean_log_return = trend_adjusted_drift + exogenous_drift_adjustment
+    mean_log_return, trend_snapshot = calculate_trend_adjusted_drift(price_df, base_mean_log_return)
     regime_model = build_regime_model(price_with_returns.tail(SIMULATION_WINDOW + REGIME_VOL_WINDOW), mean_log_return)
 
     print(f"[2] Running Monte Carlo simulations... ({NUM_SIMULATIONS} runs each)")
@@ -780,9 +559,7 @@ def main():
     print(f"Simulation statistics window: recent {recent_stats['window']} trading days")
     print(f"Simulation methods: {', '.join(SIMULATION_METHODS)}")
     print(f"Base average daily log return: {base_mean_log_return:.6f}")
-    print(f"Trend-adjusted daily drift: {trend_adjusted_drift:.6f}")
-    print(f"Exogenous drift adjustment: {exogenous_drift_adjustment:.6f}")
-    print(f"Final daily drift used in simulation: {mean_log_return:.6f}")
+    print(f"Trend-adjusted daily drift: {mean_log_return:.6f}")
     print(f"Drift adjustment from trend signals: {trend_snapshot['drift_adjustment']:.6f}")
     print(f"Daily volatility: {volatility:.6f} ({volatility * 100:.4f}%)")
 
@@ -807,33 +584,6 @@ def main():
             f"- {stats['window']:>3} days | mean log return: {stats['mean_log_return']:.6f} | "
             f"volatility: {stats['volatility']:.6f} ({stats['volatility'] * 100:.4f}%)"
         )
-
-    print("\nExogenous signals:")
-    print(
-        f"- Dollar Index latest: {exogenous_snapshot['latest_dollar_index']:.2f} | "
-        f"20D return: {exogenous_snapshot['Dollar_Index_20D']:.4f}"
-    )
-    print(
-        f"- 10Y Treasury latest: {exogenous_snapshot['latest_treasury_10y']:.2f} | "
-        f"20D change: {exogenous_snapshot['Treasury_10Y_20D_Change']:.4f}"
-    )
-    print(
-        f"- 10Y Real Rate latest: {exogenous_snapshot['latest_real_rate_10y']:.2f} | "
-        f"20D change: {exogenous_snapshot['Real_Rate_10Y_20D_Change']:.4f}"
-    )
-    print(
-        f"- VIX latest: {exogenous_snapshot['latest_vix']:.2f} | "
-        f"20D return: {exogenous_snapshot['VIX_20D']:.4f}"
-    )
-    print(
-        f"- SPY latest: {exogenous_snapshot['latest_spy']:.2f} | "
-        f"20D return: {exogenous_snapshot['SPY_20D']:.4f}"
-    )
-    print(
-        f"- Crude Oil latest: {exogenous_snapshot['latest_crude_oil']:.2f} | "
-        f"20D return: {exogenous_snapshot['Crude_Oil_20D']:.4f}"
-    )
-    print(f"- CPI latest: {exogenous_snapshot['latest_cpi']:.2f}")
 
     print("\nRegime model:")
     print(
