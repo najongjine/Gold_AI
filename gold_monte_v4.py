@@ -1,8 +1,12 @@
+import os
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import psycopg2
 import yfinance as yf
 
 from gold_monte_lightgbm import (
@@ -14,6 +18,41 @@ from gold_monte_lightgbm import (
 # -----------------------------
 # Basic settings
 # -----------------------------
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://neondb_owner:npg_p2dBsFZ9Mvfx@ep-divine-sea-ahijybu5-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require",
+)
+TABLE_NAME = "t_gold_model"
+REPORT_TIMEZONE = "Asia/Seoul"
+
+CREATE_TABLE_SQL = f"""
+CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
+    id SERIAL PRIMARY KEY,
+    ml VARCHAR NOT NULL DEFAULT '',
+    gru VARCHAR NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+"""
+
+CREATE_UPDATED_AT_FUNCTION_SQL = """
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+"""
+
+CREATE_UPDATED_AT_TRIGGER_SQL = f"""
+DROP TRIGGER IF EXISTS trg_t_gold_model_updated_at ON {TABLE_NAME};
+CREATE TRIGGER trg_t_gold_model_updated_at
+BEFORE UPDATE ON {TABLE_NAME}
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+"""
+
 # GC=F is a popular Yahoo Finance symbol for gold futures.
 TICKER = "GC=F"
 
@@ -449,6 +488,184 @@ def summarize_simulation(simulated_prices):
     return mean_path, p5_path, p50_path, p95_path
 
 
+def column_exists(cur, column_name):
+    cur.execute(
+        """
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = current_schema()
+              AND table_name = %s
+              AND column_name = %s
+        )
+        """,
+        (TABLE_NAME, column_name),
+    )
+    return bool(cur.fetchone()[0])
+
+
+def ensure_results_table(cur):
+    cur.execute(CREATE_TABLE_SQL)
+
+    if not column_exists(cur, "ml"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN ml VARCHAR NOT NULL DEFAULT ''")
+
+    if column_exists(cur, "gru") and not column_exists(cur, "monte"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} RENAME COLUMN gru TO monte")
+    elif not column_exists(cur, "monte"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN monte VARCHAR NOT NULL DEFAULT ''")
+
+    if not column_exists(cur, "created_at"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()")
+
+    if not column_exists(cur, "updated_at"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()")
+
+    cur.execute(CREATE_UPDATED_AT_FUNCTION_SQL)
+    cur.execute(CREATE_UPDATED_AT_TRIGGER_SQL)
+
+
+def build_monte_report(
+    price_df,
+    recent_stats,
+    comparison_stats,
+    base_mean_log_return,
+    mean_log_return,
+    combined_drift,
+    trend_snapshot,
+    predictive_snapshot,
+    regime_model,
+    simulation_results,
+    last_price,
+):
+    latest_data_date = price_df["Date"].iloc[-1].strftime("%Y-%m-%d")
+    lines = [
+        "===== Gold Monte Carlo Result =====",
+        f"Ticker: {TICKER}",
+        f"Latest data date: {latest_data_date}",
+        f"Latest close price: ${last_price:.2f}",
+        f"Simulation window: {recent_stats['window']} trading days",
+        f"Future horizon: {FUTURE_DAYS} trading days",
+        f"Number of simulations: {NUM_SIMULATIONS}",
+        f"Simulation methods: {', '.join(SIMULATION_METHODS)}",
+        f"Base average daily log return: {base_mean_log_return:.6f}",
+        f"Trend-adjusted daily drift: {mean_log_return:.6f}",
+        f"Monte Carlo input daily drift: {combined_drift:.6f}",
+        f"Trend drift adjustment: {trend_snapshot['drift_adjustment']:.6f}",
+        f"Daily volatility: {recent_stats['volatility']:.6f}",
+        "",
+        "[Predictive model blend]",
+        f"Status: {predictive_snapshot['message']}",
+    ]
+
+    if predictive_snapshot["enabled"]:
+        lines.extend(
+            [
+                f"Prediction date: {predictive_snapshot['prediction_date']}",
+                f"Prediction horizon: {LIGHTGBM_PREDICTION_HORIZON} trading days",
+                f"Model daily drift: {predictive_snapshot['model_daily_drift']:.6f}",
+                f"Predicted horizon return: {predictive_snapshot['predicted_horizon_return'] * 100:.2f}%",
+                f"Blend weights trend/model: {predictive_snapshot['trend_weight']:.2f} / {predictive_snapshot['model_weight']:.2f}",
+                f"CV mean MAE: {predictive_snapshot['cv_mean_mae']:.6f}",
+                f"CV directional accuracy: {predictive_snapshot['cv_directional_accuracy']:.2f}%",
+                "Top features:",
+            ]
+        )
+        for feature, score in predictive_snapshot["top_features"]:
+            lines.append(f"- {feature}: {score:.4f}")
+
+    lines.extend(
+        [
+            "",
+            "[Trend indicators]",
+            f"MA5/MA20/MA60: ${trend_snapshot['MA5']:.2f} / ${trend_snapshot['MA20']:.2f} / ${trend_snapshot['MA60']:.2f}",
+            f"RSI({RSI_WINDOW}): {trend_snapshot['RSI']:.2f}",
+            f"MACD-like momentum: {trend_snapshot['MACD_Momentum']:.6f}",
+            f"Recent 20-day return: {trend_snapshot['Return_20D'] * 100:.2f}%",
+            f"Recent 60-day return: {trend_snapshot['Return_60D'] * 100:.2f}%",
+            "",
+            "[Recent window comparison]",
+        ]
+    )
+
+    for stats in comparison_stats:
+        lines.append(
+            f"- {stats['window']} days | mean log return: {stats['mean_log_return']:.6f} | "
+            f"volatility: {stats['volatility']:.6f}"
+        )
+
+    lines.extend(
+        [
+            "",
+            "[Regime model]",
+            f"Current regime: {regime_model['current_regime']}",
+            f"Rolling-vol threshold: {regime_model['vol_threshold']:.6f}",
+        ]
+    )
+    for regime_name in regime_model["states"]:
+        stats = regime_model["regime_stats"][regime_name]
+        lines.append(
+            f"- {regime_name}: mean {stats['mean'] + regime_model['mean_adjustment']:.6f} | "
+            f"volatility {stats['volatility']:.6f} | observations {stats['count']}"
+        )
+
+    lines.extend(
+        [
+            "",
+            "[Simulation comparison]",
+        ]
+    )
+    for method, result in simulation_results.items():
+        lines.extend(
+            [
+                f"{method.capitalize()} Monte Carlo:",
+                f"- Expected mean price after {FUTURE_DAYS} days: ${result['mean_path'][-1]:.2f}",
+                f"- 5th percentile after {FUTURE_DAYS} days: ${result['p5_path'][-1]:.2f}",
+                f"- 50th percentile after {FUTURE_DAYS} days: ${result['p50_path'][-1]:.2f}",
+                f"- 95th percentile after {FUTURE_DAYS} days: ${result['p95_path'][-1]:.2f}",
+            ]
+        )
+
+    return "\n".join(lines)
+
+
+def save_monte_result_to_postgres(monte_report):
+    print(f"[3] Saving Monte Carlo result to {TABLE_NAME}...")
+    report_date = datetime.now(ZoneInfo(REPORT_TIMEZONE)).date()
+    conn = psycopg2.connect(DATABASE_URL)
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                ensure_results_table(cur)
+                cur.execute(
+                    f"""
+                    SELECT id
+                    FROM {TABLE_NAME}
+                    WHERE (created_at AT TIME ZONE %s)::date = %s
+                    ORDER BY created_at DESC, id DESC
+                    LIMIT 1
+                    """,
+                    (REPORT_TIMEZONE, report_date),
+                )
+                existing_row = cur.fetchone()
+
+                if existing_row is None:
+                    cur.execute(
+                        f"INSERT INTO {TABLE_NAME} (monte) VALUES (%s)",
+                        (monte_report,),
+                    )
+                    print(f"Inserted Monte Carlo result for {report_date}.")
+                else:
+                    cur.execute(
+                        f"UPDATE {TABLE_NAME} SET monte = %s WHERE id = %s",
+                        (monte_report, existing_row[0]),
+                    )
+                    print(f"Updated Monte Carlo result for {report_date}. id={existing_row[0]}")
+    finally:
+        conn.close()
+
+
 def plot_results(price_df, simulation_results):
     """
     Visualize historical prices and simulation results.
@@ -705,6 +922,21 @@ def main():
             f"Expected price range after {FUTURE_DAYS} days (5% to 95%): "
             f"${result['p5_path'][-1]:.2f} ~ ${result['p95_path'][-1]:.2f}"
         )
+
+    monte_report = build_monte_report(
+        price_df=price_df,
+        recent_stats=recent_stats,
+        comparison_stats=comparison_stats,
+        base_mean_log_return=base_mean_log_return,
+        mean_log_return=mean_log_return,
+        combined_drift=combined_drift,
+        trend_snapshot=trend_snapshot,
+        predictive_snapshot=predictive_snapshot,
+        regime_model=regime_model,
+        simulation_results=simulation_results,
+        last_price=last_price,
+    )
+    save_monte_result_to_postgres(monte_report)
 
     plot_results(price_df, simulation_results)
 

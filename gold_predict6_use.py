@@ -1,5 +1,7 @@
 import os
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple
+from zoneinfo import ZoneInfo
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,6 +18,7 @@ DATABASE_URL = os.getenv(
     "postgresql://neondb_owner:npg_p2dBsFZ9Mvfx@ep-divine-sea-ahijybu5-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require",
 )
 TABLE_NAME = "t_gold_model"
+REPORT_TIMEZONE = "Asia/Seoul"
 DATA_PERIOD = "10y"
 SMOOTHING_WINDOW = 60
 TARGET_WINDOW = 60
@@ -422,6 +425,78 @@ def save_report_to_postgres(ml_report: str, gru_report: str = "") -> None:
     finally:
         conn.close()
 
+def column_exists(cur, column_name: str) -> bool:
+    cur.execute(
+        """
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = current_schema()
+              AND table_name = %s
+              AND column_name = %s
+        )
+        """,
+        (TABLE_NAME, column_name),
+    )
+    return bool(cur.fetchone()[0])
+
+
+def ensure_results_table(cur) -> None:
+    cur.execute(CREATE_TABLE_SQL)
+
+    if not column_exists(cur, "ml"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN ml VARCHAR NOT NULL DEFAULT ''")
+
+    if column_exists(cur, "gru") and not column_exists(cur, "monte"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} RENAME COLUMN gru TO monte")
+    elif not column_exists(cur, "monte"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN monte VARCHAR NOT NULL DEFAULT ''")
+
+    if not column_exists(cur, "created_at"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()")
+
+    if not column_exists(cur, "updated_at"):
+        cur.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()")
+
+    cur.execute(CREATE_UPDATED_AT_FUNCTION_SQL)
+    cur.execute(CREATE_UPDATED_AT_TRIGGER_SQL)
+
+
+def save_report_to_postgres(ml_report: str) -> None:
+    print(f"{TABLE_NAME} ?뚯씠釉붿뿉 ?덉륫 由ы룷?몃? ??ν빀?덈떎.")
+    report_date = datetime.now(ZoneInfo(REPORT_TIMEZONE)).date()
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                ensure_results_table(cur)
+                cur.execute(
+                    f"""
+                    SELECT id
+                    FROM {TABLE_NAME}
+                    WHERE (created_at AT TIME ZONE %s)::date = %s
+                    ORDER BY created_at DESC, id DESC
+                    LIMIT 1
+                    """,
+                    (REPORT_TIMEZONE, report_date),
+                )
+                existing_row = cur.fetchone()
+
+                if existing_row is None:
+                    cur.execute(
+                        f"INSERT INTO {TABLE_NAME} (ml) VALUES (%s)",
+                        (ml_report,),
+                    )
+                    print(f"DB ????꾨즺. {report_date} ?좎옄??ML ?덉륫??INSERT ?덉뒿?덈떎.")
+                else:
+                    cur.execute(
+                        f"UPDATE {TABLE_NAME} SET ml = %s WHERE id = %s",
+                        (ml_report, existing_row[0]),
+                    )
+                    print(f"DB ????꾨즺. {report_date} ?좎옄 id={existing_row[0]}??ML ?덉륫??UPDATE ?덉뒿?덈떎.")
+    finally:
+        conn.close()
+
 
 if __name__ == "__main__":
     print("메인 프로세스(v6 - MACD) 시작...")
@@ -464,6 +539,6 @@ if __name__ == "__main__":
 
         print("\n[DB 저장용 리포트 미리보기]")
         print(ml_report)
-        save_report_to_postgres(ml_report=ml_report, gru_report="")
+        save_report_to_postgres(ml_report=ml_report)
     else:
         print("데이터 수집에 실패했습니다.")
