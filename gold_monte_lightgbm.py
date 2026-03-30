@@ -106,14 +106,10 @@ def add_return_features(df: pd.DataFrame, column: str, windows: List[int]) -> No
 
 
 def add_momentum_features(df: pd.DataFrame, column: str) -> None:
-    ma_short = df[column].rolling(5).mean()
     ma_mid = df[column].rolling(20).mean()
     ma_long = df[column].rolling(60).mean()
 
-    df[f"{column}_ma5_gap"] = df[column] / ma_short - 1
     df[f"{column}_ma20_gap"] = df[column] / ma_mid - 1
-    df[f"{column}_ma60_gap"] = df[column] / ma_long - 1
-    df[f"{column}_ma5_ma20_gap"] = ma_short / ma_mid - 1
     df[f"{column}_ma20_ma60_gap"] = ma_mid / ma_long - 1
 
 
@@ -149,7 +145,7 @@ def engineer_features(market_df: pd.DataFrame, require_target: bool = True) -> p
 
     price_columns = ["Gold", "Dollar_Index", "VIX", "Crude_Oil", "TIP", "TLT"]
     for column in price_columns:
-        add_return_features(df, column, [1, 5, 20, 60])
+        add_return_features(df, column, [1,20, 60])
         add_momentum_features(df, column)
         add_volatility_features(df, column, [20, 60])
 
@@ -162,11 +158,10 @@ def engineer_features(market_df: pd.DataFrame, require_target: bool = True) -> p
     df["Gold_to_TLT_ratio"] = df["Gold"] / df["TLT"]
     df["TIP_to_TLT_ratio"] = df["TIP"] / df["TLT"]
     df["TIP_minus_TLT"] = df["TIP"] - df["TLT"]
-    df["TIP_minus_TLT_change_5"] = df["TIP_minus_TLT"].diff(5)
     df["TIP_minus_TLT_change_20"] = df["TIP_minus_TLT"].diff(20)
 
-    df["vix_gold_stress"] = df["VIX_ret_5"] - df["Gold_ret_5"]
-    df["vix_tlt_stress"] = df["VIX_ret_5"] - df["TLT_ret_5"]
+    df["vix_gold_stress"] = df["VIX_ret_20"] - df["Gold_ret_20"]
+    df["vix_tlt_stress"] = df["VIX_ret_20"] - df["TLT_ret_20"]
     df["dollar_tip_interaction"] = df["Dollar_Index_ret_20"] * df["TIP_ret_20"]
     df["dollar_tlt_interaction"] = df["Dollar_Index_ret_20"] * df["TLT_ret_20"]
     df["oil_tip_interaction"] = df["Crude_Oil_ret_20"] * df["TIP_ret_20"]
