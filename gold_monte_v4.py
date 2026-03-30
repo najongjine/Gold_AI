@@ -5,6 +5,11 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
+from gold_monte_lightgbm import (
+    PREDICTION_HORIZON as LIGHTGBM_PREDICTION_HORIZON,
+    build_and_predict as build_lightgbm_prediction,
+)
+
 
 # -----------------------------
 # Basic settings
@@ -47,6 +52,10 @@ RETURN_60_DRIFT_SCALE = 0.02
 # Regime model settings
 REGIME_VOL_WINDOW = 20
 HIGH_VOL_QUANTILE = 0.65
+
+# Predictive model blend settings
+USE_LIGHTGBM_DRIFT = True
+LIGHTGBM_DRIFT_WEIGHT = 0.65
 
 
 def configure_yfinance_cache():
@@ -215,6 +224,26 @@ def calculate_trend_adjusted_drift(price_df, base_mean_log_return):
     }
 
     return adjusted_drift, trend_snapshot
+
+
+def calculate_combined_drift(trend_adjusted_drift, model_daily_drift):
+    """
+    Blend the trend-based drift and the predictive model drift.
+
+    The LightGBM output gives a directional expectation, while the Monte Carlo
+    layer still handles uncertainty by sampling many future paths around it.
+    """
+    model_weight = LIGHTGBM_DRIFT_WEIGHT
+    trend_weight = 1.0 - model_weight
+    combined_drift = trend_adjusted_drift * trend_weight + model_daily_drift * model_weight
+
+    return combined_drift, {
+        "trend_weight": trend_weight,
+        "model_weight": model_weight,
+        "trend_adjusted_drift": trend_adjusted_drift,
+        "model_daily_drift": model_daily_drift,
+        "combined_drift": combined_drift,
+    }
 
 
 def calculate_recent_statistics(price_with_returns, window):
@@ -498,7 +527,40 @@ def main():
     historical_log_returns = recent_stats["historical_log_returns"]
     last_price = price_with_returns["Close"].iloc[-1]
     mean_log_return, trend_snapshot = calculate_trend_adjusted_drift(price_df, base_mean_log_return)
-    regime_model = build_regime_model(price_with_returns.tail(SIMULATION_WINDOW + REGIME_VOL_WINDOW), mean_log_return)
+
+    predictive_result = None
+    predictive_snapshot = {
+        "enabled": False,
+        "combined_drift": mean_log_return,
+        "message": "Predictive model blend disabled.",
+    }
+
+    if USE_LIGHTGBM_DRIFT:
+        try:
+            predictive_result = build_lightgbm_prediction()
+            combined_drift, blend_snapshot = calculate_combined_drift(
+                mean_log_return,
+                predictive_result["latest_prediction"]["predicted_daily_drift"],
+            )
+            predictive_snapshot = {
+                "enabled": True,
+                "message": "Using blended predictive drift from LightGBM + trend signals.",
+                "prediction_date": predictive_result["latest_prediction"]["prediction_date"],
+                "predicted_horizon_return": predictive_result["latest_prediction"]["predicted_horizon_return"],
+                "cv_mean_mae": predictive_result["training_result"]["mean_mae"],
+                "cv_directional_accuracy": predictive_result["training_result"]["mean_directional_accuracy"],
+                "top_features": predictive_result["training_result"]["top_features"][:8],
+                **blend_snapshot,
+            }
+        except Exception as exc:
+            predictive_snapshot = {
+                "enabled": False,
+                "combined_drift": mean_log_return,
+                "message": f"LightGBM blend unavailable, falling back to trend drift only: {exc}",
+            }
+
+    combined_drift = predictive_snapshot["combined_drift"]
+    regime_model = build_regime_model(price_with_returns.tail(SIMULATION_WINDOW + REGIME_VOL_WINDOW), combined_drift)
 
     print(f"[2] Running Monte Carlo simulations... ({NUM_SIMULATIONS} runs each)")
     simulation_results = {}
@@ -506,7 +568,7 @@ def main():
     if "normal" in SIMULATION_METHODS:
         simulated_prices = normal_mc(
             last_price=last_price,
-            mean_log_return=mean_log_return,
+            mean_log_return=combined_drift,
             volatility=volatility,
             days=FUTURE_DAYS,
             simulations=NUM_SIMULATIONS,
@@ -523,7 +585,7 @@ def main():
     if "bootstrap" in SIMULATION_METHODS:
         simulated_prices = bootstrap_mc(
             last_price=last_price,
-            mean_log_return=mean_log_return,
+            mean_log_return=combined_drift,
             historical_log_returns=historical_log_returns,
             days=FUTURE_DAYS,
             simulations=NUM_SIMULATIONS,
@@ -560,8 +622,33 @@ def main():
     print(f"Simulation methods: {', '.join(SIMULATION_METHODS)}")
     print(f"Base average daily log return: {base_mean_log_return:.6f}")
     print(f"Trend-adjusted daily drift: {mean_log_return:.6f}")
+    print(f"Monte Carlo input daily drift: {combined_drift:.6f}")
     print(f"Drift adjustment from trend signals: {trend_snapshot['drift_adjustment']:.6f}")
     print(f"Daily volatility: {volatility:.6f} ({volatility * 100:.4f}%)")
+
+    print("\nPredictive model blend:")
+    print(f"- Status: {predictive_snapshot['message']}")
+    if predictive_snapshot["enabled"]:
+        print(
+            f"- LightGBM prediction date: {predictive_snapshot['prediction_date']} | "
+            f"horizon: {LIGHTGBM_PREDICTION_HORIZON} trading days"
+        )
+        print(
+            f"- Model daily drift: {predictive_snapshot['model_daily_drift']:.6f} | "
+            f"predicted {LIGHTGBM_PREDICTION_HORIZON}-day return: "
+            f"{predictive_snapshot['predicted_horizon_return'] * 100:.2f}%"
+        )
+        print(
+            f"- Blend weights trend/model: "
+            f"{predictive_snapshot['trend_weight']:.2f} / {predictive_snapshot['model_weight']:.2f}"
+        )
+        print(
+            f"- CV mean MAE: {predictive_snapshot['cv_mean_mae']:.6f} | "
+            f"CV directional accuracy: {predictive_snapshot['cv_directional_accuracy']:.2f}%"
+        )
+        print("- Top model features:")
+        for feature, score in predictive_snapshot["top_features"]:
+            print(f"  {feature}: {score:.4f}")
 
     print("\nTrend indicators:")
     print(
