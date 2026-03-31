@@ -1,0 +1,48 @@
+=== Gold Investment Macro Snapshot ===
+Base date: 2026-03-31
+
+[Dollar_Index]
+- latest_date: 2026-03-31
+- current: 100.4440
+- change_1m_pct: 2.90
+- change_3m_pct: 2.20
+- change_1y_pct: -3.61
+- mean_10y: 98.5477
+- min_10y: 88.5900
+- max_10y: 114.1100
+- position_vs_10y_mean: above_10y_mean
+
+[US_10Y_Yield]
+- latest_date: 2026-03-31
+- current: 4.3420
+- change_1m_pct: 9.59
+- change_3m_pct: 4.30
+- change_1y_pct: 2.26
+- mean_10y: 2.7504
+- min_10y: 0.4990
+- max_10y: 4.9880
+- position_vs_10y_mean: above_10y_mean
+
+[VIX]
+- latest_date: 2026-03-31
+- current: 30.6100
+- change_1m_pct: 54.13
+- change_3m_pct: 104.75
+- change_1y_pct: 37.39
+- mean_10y: 18.4054
+- min_10y: 9.1400
+- max_10y: 82.6900
+- position_vs_10y_mean: above_10y_mean
+
+[Optional:Bitcoin]
+- current: 67664.1719
+- mean_10y: 32146.6002
+
+[Optional:Computer_Electronic_Production_Index]
+- current: 132.1125
+- mean_10y: 110.9178
+
+[Interpretation Guide]
+- Stronger dollar often pressures gold.
+- Higher US 10Y yield often pressures gold.
+- Higher VIX can increase safe-haven demand, but short-term reaction can vary.

@@ -8,3 +8,4 @@ lightgbm
 datasets
 yfinance
 psycopg2-binary
+pandas_datareader

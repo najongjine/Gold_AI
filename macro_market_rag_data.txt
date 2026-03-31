@@ -1,0 +1,415 @@
+=== Macro & Market Full Summary (10 Years) ===
+Full date range: 2016-03-31 ~ 2026-03-31
+Total rows: 3653
+
+[Computer_Electronic_Production_Index]
+- latest_date: 2026-03-31
+- latest_value: 132.1125
+- min: 91.4700
+- max: 132.1125
+- mean: 110.9178
+- std: 9.6965
+
+[Bitcoin]
+- latest_date: 2026-03-31
+- latest_value: 67535.3203
+- min: 416.7290
+- max: 124752.5312
+- mean: 32146.5649
+- std: 32530.2582
+
+[Dollar_Index]
+- latest_date: 2026-03-31
+- latest_value: 100.4390
+- min: 88.5900
+- max: 114.1100
+- mean: 98.5477
+- std: 5.0162
+
+[US_10Y_Yield]
+- latest_date: 2026-03-31
+- latest_value: 4.3420
+- min: 0.4990
+- max: 4.9880
+- mean: 2.7504
+- std: 1.1906
+
+[VIX]
+- latest_date: 2026-03-31
+- latest_value: 30.6100
+- min: 9.1400
+- max: 82.6900
+- mean: 18.4054
+- std: 7.2599
+
+
+=== Macro & Market Recent Daily Data (Last 1 Year) ===
+Recent date range: 2025-04-01 ~ 2026-03-31
+Total rows: 365
+Columns: Computer_Electronic_Production_Index, Bitcoin, Dollar_Index, US_10Y_Yield, VIX
+
+date=2025-04-01 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=85169.1719 | Dollar_Index=104.2600 | US_10Y_Yield=4.1560 | VIX=21.7700
+date=2025-04-02 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=82485.7109 | Dollar_Index=103.8100 | US_10Y_Yield=4.1960 | VIX=21.5100
+date=2025-04-03 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=83102.8281 | Dollar_Index=102.0700 | US_10Y_Yield=4.0550 | VIX=30.0200
+date=2025-04-04 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=83843.8047 | Dollar_Index=103.0200 | US_10Y_Yield=3.9850 | VIX=45.3100
+date=2025-04-05 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=83504.7969 | Dollar_Index=103.0200 | US_10Y_Yield=3.9850 | VIX=45.3100
+date=2025-04-06 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=78214.4844 | Dollar_Index=103.0200 | US_10Y_Yield=3.9850 | VIX=45.3100
+date=2025-04-07 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=79235.3359 | Dollar_Index=103.2600 | US_10Y_Yield=4.1550 | VIX=46.9800
+date=2025-04-08 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=76271.9531 | Dollar_Index=102.9600 | US_10Y_Yield=4.2620 | VIX=52.3300
+date=2025-04-09 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=82573.9531 | Dollar_Index=102.9000 | US_10Y_Yield=4.4000 | VIX=33.6200
+date=2025-04-10 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=79626.1406 | Dollar_Index=100.8700 | US_10Y_Yield=4.3940 | VIX=40.7200
+date=2025-04-11 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=83404.8359 | Dollar_Index=99.7800 | US_10Y_Yield=4.4930 | VIX=37.5600
+date=2025-04-12 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=85287.1094 | Dollar_Index=99.7800 | US_10Y_Yield=4.4930 | VIX=37.5600
+date=2025-04-13 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=83684.9766 | Dollar_Index=99.7800 | US_10Y_Yield=4.4930 | VIX=37.5600
+date=2025-04-14 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=84542.3906 | Dollar_Index=99.6400 | US_10Y_Yield=4.3640 | VIX=30.8900
+date=2025-04-15 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=83668.9922 | Dollar_Index=100.2200 | US_10Y_Yield=4.3230 | VIX=30.1200
+date=2025-04-16 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=84033.8672 | Dollar_Index=99.3800 | US_10Y_Yield=4.2790 | VIX=32.6400
+date=2025-04-17 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=84895.7500 | Dollar_Index=99.3800 | US_10Y_Yield=4.3330 | VIX=29.6500
+date=2025-04-18 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=84450.8047 | Dollar_Index=99.3800 | US_10Y_Yield=4.3330 | VIX=29.6500
+date=2025-04-19 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=85063.4141 | Dollar_Index=99.3800 | US_10Y_Yield=4.3330 | VIX=29.6500
+date=2025-04-20 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=85174.3047 | Dollar_Index=99.3800 | US_10Y_Yield=4.3330 | VIX=29.6500
+date=2025-04-21 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=87518.9062 | Dollar_Index=98.2800 | US_10Y_Yield=4.4050 | VIX=33.8200
+date=2025-04-22 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=93441.8906 | Dollar_Index=98.9200 | US_10Y_Yield=4.3890 | VIX=30.5700
+date=2025-04-23 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=93699.1094 | Dollar_Index=99.8400 | US_10Y_Yield=4.3870 | VIX=28.4500
+date=2025-04-24 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=93943.7969 | Dollar_Index=99.2900 | US_10Y_Yield=4.3050 | VIX=26.4700
+date=2025-04-25 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=94720.5000 | Dollar_Index=99.4700 | US_10Y_Yield=4.2660 | VIX=24.8400
+date=2025-04-26 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=94646.9297 | Dollar_Index=99.4700 | US_10Y_Yield=4.2660 | VIX=24.8400
+date=2025-04-27 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=93754.8438 | Dollar_Index=99.4700 | US_10Y_Yield=4.2660 | VIX=24.8400
+date=2025-04-28 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=94978.7500 | Dollar_Index=99.0100 | US_10Y_Yield=4.2160 | VIX=25.1500
+date=2025-04-29 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=94284.7891 | Dollar_Index=99.2400 | US_10Y_Yield=4.1730 | VIX=24.1700
+date=2025-04-30 | Computer_Electronic_Production_Index=124.9065 | Bitcoin=94207.3125 | Dollar_Index=99.4700 | US_10Y_Yield=4.1770 | VIX=24.7000
+date=2025-05-01 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=96492.3359 | Dollar_Index=100.2500 | US_10Y_Yield=4.2310 | VIX=24.6000
+date=2025-05-02 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=96910.0703 | Dollar_Index=100.0000 | US_10Y_Yield=4.3220 | VIX=22.6800
+date=2025-05-03 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=95891.7969 | Dollar_Index=100.0000 | US_10Y_Yield=4.3220 | VIX=22.6800
+date=2025-05-04 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=94315.9766 | Dollar_Index=100.0000 | US_10Y_Yield=4.3220 | VIX=22.6800
+date=2025-05-05 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=94748.0547 | Dollar_Index=99.8300 | US_10Y_Yield=4.3430 | VIX=23.6400
+date=2025-05-06 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=96802.4766 | Dollar_Index=99.2400 | US_10Y_Yield=4.3080 | VIX=24.7600
+date=2025-05-07 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=97032.3203 | Dollar_Index=99.6100 | US_10Y_Yield=4.2750 | VIX=23.5500
+date=2025-05-08 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=103241.4609 | Dollar_Index=100.6400 | US_10Y_Yield=4.3730 | VIX=22.4800
+date=2025-05-09 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=102970.8516 | Dollar_Index=100.3400 | US_10Y_Yield=4.3750 | VIX=21.9000
+date=2025-05-10 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=104696.3281 | Dollar_Index=100.3400 | US_10Y_Yield=4.3750 | VIX=21.9000
+date=2025-05-11 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=104106.3594 | Dollar_Index=100.3400 | US_10Y_Yield=4.3750 | VIX=21.9000
+date=2025-05-12 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=102812.9531 | Dollar_Index=101.7900 | US_10Y_Yield=4.4570 | VIX=18.3900
+date=2025-05-13 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=104169.8125 | Dollar_Index=101.0000 | US_10Y_Yield=4.4990 | VIX=18.2200
+date=2025-05-14 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=103539.4141 | Dollar_Index=101.0400 | US_10Y_Yield=4.5280 | VIX=18.6200
+date=2025-05-15 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=103744.6406 | Dollar_Index=100.8800 | US_10Y_Yield=4.4550 | VIX=17.8300
+date=2025-05-16 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=103489.2891 | Dollar_Index=101.0900 | US_10Y_Yield=4.4410 | VIX=17.2400
+date=2025-05-17 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=103191.0859 | Dollar_Index=101.0900 | US_10Y_Yield=4.4410 | VIX=17.2400
+date=2025-05-18 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=106446.0078 | Dollar_Index=101.0900 | US_10Y_Yield=4.4410 | VIX=17.2400
+date=2025-05-19 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=105606.1797 | Dollar_Index=100.4300 | US_10Y_Yield=4.4750 | VIX=18.1400
+date=2025-05-20 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=106791.0859 | Dollar_Index=100.1200 | US_10Y_Yield=4.4810 | VIX=18.0900
+date=2025-05-21 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=109678.0781 | Dollar_Index=99.5600 | US_10Y_Yield=4.5960 | VIX=20.8700
+date=2025-05-22 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=111673.2812 | Dollar_Index=99.9600 | US_10Y_Yield=4.5530 | VIX=20.2800
+date=2025-05-23 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=107287.7969 | Dollar_Index=99.1100 | US_10Y_Yield=4.5090 | VIX=22.2900
+date=2025-05-24 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=107791.1562 | Dollar_Index=99.1100 | US_10Y_Yield=4.5090 | VIX=22.2900
+date=2025-05-25 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=109035.3906 | Dollar_Index=99.1100 | US_10Y_Yield=4.5090 | VIX=22.2900
+date=2025-05-26 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=109440.3672 | Dollar_Index=98.9300 | US_10Y_Yield=4.5090 | VIX=22.2900
+date=2025-05-27 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=108994.6406 | Dollar_Index=99.5200 | US_10Y_Yield=4.4340 | VIX=18.9600
+date=2025-05-28 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=107802.3281 | Dollar_Index=99.8800 | US_10Y_Yield=4.4770 | VIX=19.3100
+date=2025-05-29 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=105641.7578 | Dollar_Index=99.2800 | US_10Y_Yield=4.4240 | VIX=19.1800
+date=2025-05-30 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=103998.5703 | Dollar_Index=99.3300 | US_10Y_Yield=4.4160 | VIX=18.5700
+date=2025-05-31 | Computer_Electronic_Production_Index=125.1695 | Bitcoin=104638.0938 | Dollar_Index=99.3300 | US_10Y_Yield=4.4160 | VIX=18.5700
+date=2025-06-01 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105652.1016 | Dollar_Index=99.3300 | US_10Y_Yield=4.4160 | VIX=18.5700
+date=2025-06-02 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105881.5312 | Dollar_Index=98.7000 | US_10Y_Yield=4.4620 | VIX=18.3600
+date=2025-06-03 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105432.4688 | Dollar_Index=99.2500 | US_10Y_Yield=4.4600 | VIX=17.6900
+date=2025-06-04 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=104731.9844 | Dollar_Index=98.7900 | US_10Y_Yield=4.3650 | VIX=17.6100
+date=2025-06-05 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=101575.9531 | Dollar_Index=98.7400 | US_10Y_Yield=4.3940 | VIX=18.4800
+date=2025-06-06 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=104390.3438 | Dollar_Index=99.1900 | US_10Y_Yield=4.5100 | VIX=16.7700
+date=2025-06-07 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105615.6250 | Dollar_Index=99.1900 | US_10Y_Yield=4.5100 | VIX=16.7700
+date=2025-06-08 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105793.6484 | Dollar_Index=99.1900 | US_10Y_Yield=4.5100 | VIX=16.7700
+date=2025-06-09 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=110294.1016 | Dollar_Index=98.9400 | US_10Y_Yield=4.4820 | VIX=17.1600
+date=2025-06-10 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=110257.2344 | Dollar_Index=99.0500 | US_10Y_Yield=4.4740 | VIX=16.9500
+date=2025-06-11 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=108686.6250 | Dollar_Index=98.6300 | US_10Y_Yield=4.4120 | VIX=17.2600
+date=2025-06-12 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105929.0547 | Dollar_Index=97.9200 | US_10Y_Yield=4.3570 | VIX=18.0200
+date=2025-06-13 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=106090.9688 | Dollar_Index=98.1800 | US_10Y_Yield=4.4240 | VIX=20.8200
+date=2025-06-14 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105472.4062 | Dollar_Index=98.1800 | US_10Y_Yield=4.4240 | VIX=20.8200
+date=2025-06-15 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105552.0234 | Dollar_Index=98.1800 | US_10Y_Yield=4.4240 | VIX=20.8200
+date=2025-06-16 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=106796.7578 | Dollar_Index=98.0000 | US_10Y_Yield=4.4520 | VIX=19.1100
+date=2025-06-17 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=104601.1172 | Dollar_Index=98.8200 | US_10Y_Yield=4.3930 | VIX=21.6000
+date=2025-06-18 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=104883.3281 | Dollar_Index=98.9100 | US_10Y_Yield=4.3970 | VIX=20.1400
+date=2025-06-19 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=104684.2891 | Dollar_Index=98.9100 | US_10Y_Yield=4.3970 | VIX=20.1400
+date=2025-06-20 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=103309.6016 | Dollar_Index=98.7100 | US_10Y_Yield=4.3750 | VIX=20.6200
+date=2025-06-21 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=102257.4062 | Dollar_Index=98.7100 | US_10Y_Yield=4.3750 | VIX=20.6200
+date=2025-06-22 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=100987.1406 | Dollar_Index=98.7100 | US_10Y_Yield=4.3750 | VIX=20.6200
+date=2025-06-23 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=105577.7734 | Dollar_Index=98.4200 | US_10Y_Yield=4.3200 | VIX=19.8300
+date=2025-06-24 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=106045.6328 | Dollar_Index=97.8600 | US_10Y_Yield=4.2930 | VIX=17.4800
+date=2025-06-25 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=107361.2578 | Dollar_Index=97.6800 | US_10Y_Yield=4.2930 | VIX=16.7600
+date=2025-06-26 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=106960.0000 | Dollar_Index=97.1500 | US_10Y_Yield=4.2530 | VIX=16.5900
+date=2025-06-27 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=107088.4297 | Dollar_Index=97.4000 | US_10Y_Yield=4.2830 | VIX=16.3200
+date=2025-06-28 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=107327.7031 | Dollar_Index=97.4000 | US_10Y_Yield=4.2830 | VIX=16.3200
+date=2025-06-29 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=108385.5703 | Dollar_Index=97.4000 | US_10Y_Yield=4.2830 | VIX=16.3200
+date=2025-06-30 | Computer_Electronic_Production_Index=125.0217 | Bitcoin=107135.3359 | Dollar_Index=96.8800 | US_10Y_Yield=4.2300 | VIX=16.7300
+date=2025-07-01 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=105698.2812 | Dollar_Index=96.8200 | US_10Y_Yield=4.2510 | VIX=16.8300
+date=2025-07-02 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=108859.3203 | Dollar_Index=96.7800 | US_10Y_Yield=4.2930 | VIX=16.6400
+date=2025-07-03 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=109647.9766 | Dollar_Index=97.1800 | US_10Y_Yield=4.3480 | VIX=16.3800
+date=2025-07-04 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=108034.3359 | Dollar_Index=97.1800 | US_10Y_Yield=4.3480 | VIX=16.3800
+date=2025-07-05 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=108231.1797 | Dollar_Index=97.1800 | US_10Y_Yield=4.3480 | VIX=16.3800
+date=2025-07-06 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=109232.0703 | Dollar_Index=97.1800 | US_10Y_Yield=4.3480 | VIX=16.3800
+date=2025-07-07 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=108299.8516 | Dollar_Index=97.4800 | US_10Y_Yield=4.3950 | VIX=17.7900
+date=2025-07-08 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=108950.2734 | Dollar_Index=97.5100 | US_10Y_Yield=4.4150 | VIX=16.8100
+date=2025-07-09 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=111326.5547 | Dollar_Index=97.4700 | US_10Y_Yield=4.3420 | VIX=15.9400
+date=2025-07-10 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=115987.2031 | Dollar_Index=97.6500 | US_10Y_Yield=4.3460 | VIX=15.7800
+date=2025-07-11 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117516.9922 | Dollar_Index=97.8500 | US_10Y_Yield=4.4230 | VIX=16.4000
+date=2025-07-12 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117435.2266 | Dollar_Index=97.8500 | US_10Y_Yield=4.4230 | VIX=16.4000
+date=2025-07-13 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=119116.1172 | Dollar_Index=97.8500 | US_10Y_Yield=4.4230 | VIX=16.4000
+date=2025-07-14 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=119849.7031 | Dollar_Index=98.0800 | US_10Y_Yield=4.4270 | VIX=17.2000
+date=2025-07-15 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117777.1875 | Dollar_Index=98.6200 | US_10Y_Yield=4.4890 | VIX=17.3800
+date=2025-07-16 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=118738.5078 | Dollar_Index=98.3900 | US_10Y_Yield=4.4550 | VIX=17.1600
+date=2025-07-17 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=119289.8438 | Dollar_Index=98.7300 | US_10Y_Yield=4.4630 | VIX=16.5200
+date=2025-07-18 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=118003.2266 | Dollar_Index=98.4800 | US_10Y_Yield=4.4320 | VIX=16.4100
+date=2025-07-19 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117939.9766 | Dollar_Index=98.4800 | US_10Y_Yield=4.4320 | VIX=16.4100
+date=2025-07-20 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117300.7891 | Dollar_Index=98.4800 | US_10Y_Yield=4.4320 | VIX=16.4100
+date=2025-07-21 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117439.5391 | Dollar_Index=97.8500 | US_10Y_Yield=4.3720 | VIX=16.6500
+date=2025-07-22 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=119995.4141 | Dollar_Index=97.3900 | US_10Y_Yield=4.3360 | VIX=16.5000
+date=2025-07-23 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=118754.9609 | Dollar_Index=97.2100 | US_10Y_Yield=4.3880 | VIX=15.3700
+date=2025-07-24 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=118368.0000 | Dollar_Index=97.3800 | US_10Y_Yield=4.4080 | VIX=15.3900
+date=2025-07-25 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117635.8828 | Dollar_Index=97.6500 | US_10Y_Yield=4.3860 | VIX=14.9300
+date=2025-07-26 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117947.3672 | Dollar_Index=97.6500 | US_10Y_Yield=4.3860 | VIX=14.9300
+date=2025-07-27 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=119448.4922 | Dollar_Index=97.6500 | US_10Y_Yield=4.3860 | VIX=14.9300
+date=2025-07-28 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117924.4766 | Dollar_Index=98.6600 | US_10Y_Yield=4.4200 | VIX=15.0300
+date=2025-07-29 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117922.1484 | Dollar_Index=98.9100 | US_10Y_Yield=4.3300 | VIX=15.9800
+date=2025-07-30 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=117831.1875 | Dollar_Index=99.9400 | US_10Y_Yield=4.3760 | VIX=15.4800
+date=2025-07-31 | Computer_Electronic_Production_Index=127.8787 | Bitcoin=115758.2031 | Dollar_Index=100.0300 | US_10Y_Yield=4.3600 | VIX=16.7200
+date=2025-08-01 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=113320.0859 | Dollar_Index=98.6900 | US_10Y_Yield=4.2200 | VIX=20.3800
+date=2025-08-02 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=112526.9141 | Dollar_Index=98.6900 | US_10Y_Yield=4.2200 | VIX=20.3800
+date=2025-08-03 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=114217.6719 | Dollar_Index=98.6900 | US_10Y_Yield=4.2200 | VIX=20.3800
+date=2025-08-04 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=115071.8828 | Dollar_Index=98.7800 | US_10Y_Yield=4.2000 | VIX=17.5200
+date=2025-08-05 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=114141.4453 | Dollar_Index=98.7800 | US_10Y_Yield=4.1960 | VIX=17.8500
+date=2025-08-06 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=115028.0000 | Dollar_Index=98.1800 | US_10Y_Yield=4.2200 | VIX=16.7700
+date=2025-08-07 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=117496.8984 | Dollar_Index=98.4000 | US_10Y_Yield=4.2440 | VIX=16.5700
+date=2025-08-08 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=116688.7266 | Dollar_Index=98.1800 | US_10Y_Yield=4.2850 | VIX=15.1500
+date=2025-08-09 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=116500.3594 | Dollar_Index=98.1800 | US_10Y_Yield=4.2850 | VIX=15.1500
+date=2025-08-10 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=119306.7578 | Dollar_Index=98.1800 | US_10Y_Yield=4.2850 | VIX=15.1500
+date=2025-08-11 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=118731.4453 | Dollar_Index=98.5200 | US_10Y_Yield=4.2730 | VIX=16.2500
+date=2025-08-12 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=120172.9062 | Dollar_Index=98.1000 | US_10Y_Yield=4.2930 | VIX=14.7300
+date=2025-08-13 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=123344.0625 | Dollar_Index=97.8400 | US_10Y_Yield=4.2380 | VIX=14.4900
+date=2025-08-14 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=118359.5781 | Dollar_Index=98.2500 | US_10Y_Yield=4.2930 | VIX=14.8300
+date=2025-08-15 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=117398.3516 | Dollar_Index=97.8500 | US_10Y_Yield=4.3280 | VIX=15.0900
+date=2025-08-16 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=117491.3516 | Dollar_Index=97.8500 | US_10Y_Yield=4.3280 | VIX=15.0900
+date=2025-08-17 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=117453.0625 | Dollar_Index=97.8500 | US_10Y_Yield=4.3280 | VIX=15.0900
+date=2025-08-18 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=116252.3125 | Dollar_Index=98.1700 | US_10Y_Yield=4.3410 | VIX=14.9900
+date=2025-08-19 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=112831.1797 | Dollar_Index=98.2700 | US_10Y_Yield=4.3020 | VIX=15.5700
+date=2025-08-20 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=114274.7422 | Dollar_Index=98.2200 | US_10Y_Yield=4.2960 | VIX=15.6900
+date=2025-08-21 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=112419.0312 | Dollar_Index=98.6200 | US_10Y_Yield=4.3300 | VIX=16.6000
+date=2025-08-22 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=116874.0859 | Dollar_Index=97.7200 | US_10Y_Yield=4.2600 | VIX=14.2200
+date=2025-08-23 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=115374.3281 | Dollar_Index=97.7200 | US_10Y_Yield=4.2600 | VIX=14.2200
+date=2025-08-24 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=113458.4297 | Dollar_Index=97.7200 | US_10Y_Yield=4.2600 | VIX=14.2200
+date=2025-08-25 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=110124.3516 | Dollar_Index=98.4300 | US_10Y_Yield=4.2750 | VIX=14.7900
+date=2025-08-26 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=111802.6562 | Dollar_Index=98.2300 | US_10Y_Yield=4.2580 | VIX=14.6200
+date=2025-08-27 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=111222.0625 | Dollar_Index=98.2300 | US_10Y_Yield=4.2380 | VIX=14.8500
+date=2025-08-28 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=112544.8047 | Dollar_Index=97.8100 | US_10Y_Yield=4.2070 | VIX=14.4300
+date=2025-08-29 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=108410.8359 | Dollar_Index=97.7700 | US_10Y_Yield=4.2270 | VIX=15.3600
+date=2025-08-30 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=108808.0703 | Dollar_Index=97.7700 | US_10Y_Yield=4.2270 | VIX=15.3600
+date=2025-08-31 | Computer_Electronic_Production_Index=127.5978 | Bitcoin=108236.7109 | Dollar_Index=97.7700 | US_10Y_Yield=4.2270 | VIX=15.3600
+date=2025-09-01 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=109250.5938 | Dollar_Index=97.7700 | US_10Y_Yield=4.2270 | VIX=15.3600
+date=2025-09-02 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=111200.5859 | Dollar_Index=98.4000 | US_10Y_Yield=4.2770 | VIX=17.1700
+date=2025-09-03 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=111723.2109 | Dollar_Index=98.1400 | US_10Y_Yield=4.2110 | VIX=16.3500
+date=2025-09-04 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=110723.6016 | Dollar_Index=98.3500 | US_10Y_Yield=4.1760 | VIX=15.3000
+date=2025-09-05 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=110650.9844 | Dollar_Index=97.7700 | US_10Y_Yield=4.0860 | VIX=15.1800
+date=2025-09-06 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=110224.6953 | Dollar_Index=97.7700 | US_10Y_Yield=4.0860 | VIX=15.1800
+date=2025-09-07 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=111167.6172 | Dollar_Index=97.7700 | US_10Y_Yield=4.0860 | VIX=15.1800
+date=2025-09-08 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=112071.4297 | Dollar_Index=97.4500 | US_10Y_Yield=4.0460 | VIX=15.1100
+date=2025-09-09 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=111530.5469 | Dollar_Index=97.7900 | US_10Y_Yield=4.0740 | VIX=15.0400
+date=2025-09-10 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=113955.3594 | Dollar_Index=97.7800 | US_10Y_Yield=4.0320 | VIX=15.3500
+date=2025-09-11 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=115507.5391 | Dollar_Index=97.5400 | US_10Y_Yield=4.0110 | VIX=14.7100
+date=2025-09-12 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=116101.5781 | Dollar_Index=97.5500 | US_10Y_Yield=4.0610 | VIX=14.7600
+date=2025-09-13 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=115950.5078 | Dollar_Index=97.5500 | US_10Y_Yield=4.0610 | VIX=14.7600
+date=2025-09-14 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=115407.6562 | Dollar_Index=97.5500 | US_10Y_Yield=4.0610 | VIX=14.7600
+date=2025-09-15 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=115444.8750 | Dollar_Index=97.3000 | US_10Y_Yield=4.0340 | VIX=15.6900
+date=2025-09-16 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=116843.1875 | Dollar_Index=96.6300 | US_10Y_Yield=4.0260 | VIX=16.3600
+date=2025-09-17 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=116468.5078 | Dollar_Index=96.8700 | US_10Y_Yield=4.0760 | VIX=15.7200
+date=2025-09-18 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=117137.2031 | Dollar_Index=97.3500 | US_10Y_Yield=4.1040 | VIX=15.7000
+date=2025-09-19 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=115688.8594 | Dollar_Index=97.6400 | US_10Y_Yield=4.1390 | VIX=15.4500
+date=2025-09-20 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=115721.9609 | Dollar_Index=97.6400 | US_10Y_Yield=4.1390 | VIX=15.4500
+date=2025-09-21 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=115306.0938 | Dollar_Index=97.6400 | US_10Y_Yield=4.1390 | VIX=15.4500
+date=2025-09-22 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=112748.5078 | Dollar_Index=97.3300 | US_10Y_Yield=4.1430 | VIX=16.1000
+date=2025-09-23 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=112014.5000 | Dollar_Index=97.2600 | US_10Y_Yield=4.1200 | VIX=16.6400
+date=2025-09-24 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=113328.6328 | Dollar_Index=97.8700 | US_10Y_Yield=4.1470 | VIX=16.1800
+date=2025-09-25 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=109049.2891 | Dollar_Index=98.5500 | US_10Y_Yield=4.1720 | VIX=16.7400
+date=2025-09-26 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=109712.8281 | Dollar_Index=98.1500 | US_10Y_Yield=4.1870 | VIX=15.2900
+date=2025-09-27 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=109681.9453 | Dollar_Index=98.1500 | US_10Y_Yield=4.1870 | VIX=15.2900
+date=2025-09-28 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=112122.6406 | Dollar_Index=98.1500 | US_10Y_Yield=4.1870 | VIX=15.2900
+date=2025-09-29 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=114400.3828 | Dollar_Index=97.9100 | US_10Y_Yield=4.1410 | VIX=16.1200
+date=2025-09-30 | Computer_Electronic_Production_Index=127.4438 | Bitcoin=114056.0859 | Dollar_Index=97.7700 | US_10Y_Yield=4.1480 | VIX=16.2800
+date=2025-10-01 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=118648.9297 | Dollar_Index=97.7100 | US_10Y_Yield=4.1060 | VIX=16.2900
+date=2025-10-02 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=120681.2578 | Dollar_Index=97.8500 | US_10Y_Yield=4.0880 | VIX=16.6300
+date=2025-10-03 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=122266.5312 | Dollar_Index=97.7200 | US_10Y_Yield=4.1190 | VIX=16.6500
+date=2025-10-04 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=122425.4297 | Dollar_Index=97.7200 | US_10Y_Yield=4.1190 | VIX=16.6500
+date=2025-10-05 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=123513.4766 | Dollar_Index=97.7200 | US_10Y_Yield=4.1190 | VIX=16.6500
+date=2025-10-06 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=124752.5312 | Dollar_Index=98.1100 | US_10Y_Yield=4.1620 | VIX=16.3700
+date=2025-10-07 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=121451.3828 | Dollar_Index=98.5800 | US_10Y_Yield=4.1270 | VIX=17.2400
+date=2025-10-08 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=123354.8672 | Dollar_Index=98.8500 | US_10Y_Yield=4.1290 | VIX=16.3000
+date=2025-10-09 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=121705.5859 | Dollar_Index=99.5400 | US_10Y_Yield=4.1480 | VIX=16.4300
+date=2025-10-10 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=113214.3672 | Dollar_Index=98.9800 | US_10Y_Yield=4.0510 | VIX=21.6600
+date=2025-10-11 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=110807.8828 | Dollar_Index=98.9800 | US_10Y_Yield=4.0510 | VIX=21.6600
+date=2025-10-12 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=115169.7656 | Dollar_Index=98.9800 | US_10Y_Yield=4.0510 | VIX=21.6600
+date=2025-10-13 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=115271.0781 | Dollar_Index=99.2700 | US_10Y_Yield=4.0510 | VIX=19.0300
+date=2025-10-14 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=113118.6641 | Dollar_Index=99.0500 | US_10Y_Yield=4.0220 | VIX=20.8100
+date=2025-10-15 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=110783.1641 | Dollar_Index=98.7900 | US_10Y_Yield=4.0460 | VIX=20.6400
+date=2025-10-16 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=108186.0391 | Dollar_Index=98.3900 | US_10Y_Yield=3.9760 | VIX=25.3100
+date=2025-10-17 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=106467.7891 | Dollar_Index=98.4300 | US_10Y_Yield=4.0070 | VIX=20.7800
+date=2025-10-18 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=107198.2656 | Dollar_Index=98.4300 | US_10Y_Yield=4.0070 | VIX=20.7800
+date=2025-10-19 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=108666.7109 | Dollar_Index=98.4300 | US_10Y_Yield=4.0070 | VIX=20.7800
+date=2025-10-20 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=110588.9297 | Dollar_Index=98.5900 | US_10Y_Yield=3.9860 | VIX=18.2300
+date=2025-10-21 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=108476.8906 | Dollar_Index=98.9300 | US_10Y_Yield=3.9630 | VIX=17.8700
+date=2025-10-22 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=107688.5859 | Dollar_Index=98.9000 | US_10Y_Yield=3.9530 | VIX=18.6000
+date=2025-10-23 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=110069.7266 | Dollar_Index=98.9400 | US_10Y_Yield=3.9910 | VIX=17.3000
+date=2025-10-24 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=111033.9219 | Dollar_Index=98.9500 | US_10Y_Yield=3.9970 | VIX=16.3700
+date=2025-10-25 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=111641.7266 | Dollar_Index=98.9500 | US_10Y_Yield=3.9970 | VIX=16.3700
+date=2025-10-26 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=114472.4453 | Dollar_Index=98.9500 | US_10Y_Yield=3.9970 | VIX=16.3700
+date=2025-10-27 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=114119.3281 | Dollar_Index=98.7800 | US_10Y_Yield=3.9970 | VIX=15.7900
+date=2025-10-28 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=112956.1641 | Dollar_Index=98.6900 | US_10Y_Yield=3.9830 | VIX=16.4200
+date=2025-10-29 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=110055.3047 | Dollar_Index=99.2200 | US_10Y_Yield=4.0580 | VIX=16.9200
+date=2025-10-30 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=108305.5469 | Dollar_Index=99.5300 | US_10Y_Yield=4.0930 | VIX=16.9100
+date=2025-10-31 | Computer_Electronic_Production_Index=129.5652 | Bitcoin=109556.1641 | Dollar_Index=99.8000 | US_10Y_Yield=4.1010 | VIX=17.4400
+date=2025-11-01 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=110064.0156 | Dollar_Index=99.8000 | US_10Y_Yield=4.1010 | VIX=17.4400
+date=2025-11-02 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=110639.6250 | Dollar_Index=99.8000 | US_10Y_Yield=4.1010 | VIX=17.4400
+date=2025-11-03 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=106547.5234 | Dollar_Index=99.8700 | US_10Y_Yield=4.1060 | VIX=17.1700
+date=2025-11-04 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=101590.5234 | Dollar_Index=100.2200 | US_10Y_Yield=4.0890 | VIX=19.0000
+date=2025-11-05 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=103891.8359 | Dollar_Index=100.2000 | US_10Y_Yield=4.1570 | VIX=18.0100
+date=2025-11-06 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=101301.2891 | Dollar_Index=99.7300 | US_10Y_Yield=4.0930 | VIX=19.5000
+date=2025-11-07 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=103372.4062 | Dollar_Index=99.6000 | US_10Y_Yield=4.0930 | VIX=19.0800
+date=2025-11-08 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=102282.1172 | Dollar_Index=99.6000 | US_10Y_Yield=4.0930 | VIX=19.0800
+date=2025-11-09 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=104719.6406 | Dollar_Index=99.6000 | US_10Y_Yield=4.0930 | VIX=19.0800
+date=2025-11-10 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=105996.5938 | Dollar_Index=99.6200 | US_10Y_Yield=4.1100 | VIX=17.6000
+date=2025-11-11 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=102997.4688 | Dollar_Index=99.4600 | US_10Y_Yield=4.1200 | VIX=17.2800
+date=2025-11-12 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=101663.1875 | Dollar_Index=99.4800 | US_10Y_Yield=4.0650 | VIX=17.5100
+date=2025-11-13 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=99697.4922 | Dollar_Index=99.1800 | US_10Y_Yield=4.1120 | VIX=20.0000
+date=2025-11-14 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=94397.7891 | Dollar_Index=99.2700 | US_10Y_Yield=4.1480 | VIX=19.8300
+date=2025-11-15 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=95549.1484 | Dollar_Index=99.2700 | US_10Y_Yield=4.1480 | VIX=19.8300
+date=2025-11-16 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=94177.0781 | Dollar_Index=99.2700 | US_10Y_Yield=4.1480 | VIX=19.8300
+date=2025-11-17 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=92093.8750 | Dollar_Index=99.5900 | US_10Y_Yield=4.1330 | VIX=22.3800
+date=2025-11-18 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=92948.8750 | Dollar_Index=99.5500 | US_10Y_Yield=4.1230 | VIX=24.6900
+date=2025-11-19 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=91465.9922 | Dollar_Index=100.2300 | US_10Y_Yield=4.1330 | VIX=23.6600
+date=2025-11-20 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=86631.8984 | Dollar_Index=100.1600 | US_10Y_Yield=4.1060 | VIX=26.4200
+date=2025-11-21 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=85090.6875 | Dollar_Index=100.1800 | US_10Y_Yield=4.0630 | VIX=23.4300
+date=2025-11-22 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=84648.3594 | Dollar_Index=100.1800 | US_10Y_Yield=4.0630 | VIX=23.4300
+date=2025-11-23 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=86805.0078 | Dollar_Index=100.1800 | US_10Y_Yield=4.0630 | VIX=23.4300
+date=2025-11-24 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=88270.5625 | Dollar_Index=100.1400 | US_10Y_Yield=4.0380 | VIX=20.5200
+date=2025-11-25 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=87341.8906 | Dollar_Index=99.6600 | US_10Y_Yield=4.0020 | VIX=18.5600
+date=2025-11-26 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=90518.3672 | Dollar_Index=99.6000 | US_10Y_Yield=3.9980 | VIX=17.1900
+date=2025-11-27 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=91285.3750 | Dollar_Index=99.6000 | US_10Y_Yield=3.9980 | VIX=17.1900
+date=2025-11-28 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=90919.2656 | Dollar_Index=99.4600 | US_10Y_Yield=4.0170 | VIX=16.3500
+date=2025-11-29 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=90851.7578 | Dollar_Index=99.4600 | US_10Y_Yield=4.0170 | VIX=16.3500
+date=2025-11-30 | Computer_Electronic_Production_Index=130.4808 | Bitcoin=90394.3125 | Dollar_Index=99.4600 | US_10Y_Yield=4.0170 | VIX=16.3500
+date=2025-12-01 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=86321.5703 | Dollar_Index=99.4100 | US_10Y_Yield=4.0960 | VIX=17.2400
+date=2025-12-02 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=91350.2031 | Dollar_Index=99.3600 | US_10Y_Yield=4.0860 | VIX=16.5900
+date=2025-12-03 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=93527.8047 | Dollar_Index=98.8500 | US_10Y_Yield=4.0570 | VIX=16.0800
+date=2025-12-04 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=92141.6250 | Dollar_Index=98.9900 | US_10Y_Yield=4.1080 | VIX=15.7800
+date=2025-12-05 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=89387.7578 | Dollar_Index=98.9900 | US_10Y_Yield=4.1390 | VIX=15.4100
+date=2025-12-06 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=89272.3750 | Dollar_Index=98.9900 | US_10Y_Yield=4.1390 | VIX=15.4100
+date=2025-12-07 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=90405.6406 | Dollar_Index=98.9900 | US_10Y_Yield=4.1390 | VIX=15.4100
+date=2025-12-08 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=90640.2031 | Dollar_Index=99.0900 | US_10Y_Yield=4.1720 | VIX=16.6600
+date=2025-12-09 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=92691.7109 | Dollar_Index=99.2200 | US_10Y_Yield=4.1860 | VIX=16.9300
+date=2025-12-10 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=92020.9453 | Dollar_Index=98.7900 | US_10Y_Yield=4.1640 | VIX=15.7700
+date=2025-12-11 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=92511.3359 | Dollar_Index=98.3500 | US_10Y_Yield=4.1410 | VIX=14.8500
+date=2025-12-12 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=90270.4141 | Dollar_Index=98.4000 | US_10Y_Yield=4.1940 | VIX=15.7400
+date=2025-12-13 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=90298.7109 | Dollar_Index=98.4000 | US_10Y_Yield=4.1940 | VIX=15.7400
+date=2025-12-14 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=88175.1797 | Dollar_Index=98.4000 | US_10Y_Yield=4.1940 | VIX=15.7400
+date=2025-12-15 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=86419.7812 | Dollar_Index=98.1500 | US_10Y_Yield=4.1820 | VIX=16.5000
+date=2025-12-16 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87843.9844 | Dollar_Index=98.1500 | US_10Y_Yield=4.1490 | VIX=16.4800
+date=2025-12-17 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=86143.7578 | Dollar_Index=98.3700 | US_10Y_Yield=4.1510 | VIX=17.6200
+date=2025-12-18 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=85462.5078 | Dollar_Index=98.4300 | US_10Y_Yield=4.1160 | VIX=16.8700
+date=2025-12-19 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=88103.3828 | Dollar_Index=98.6000 | US_10Y_Yield=4.1510 | VIX=14.9100
+date=2025-12-20 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=88344.0000 | Dollar_Index=98.6000 | US_10Y_Yield=4.1510 | VIX=14.9100
+date=2025-12-21 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=88621.7500 | Dollar_Index=98.6000 | US_10Y_Yield=4.1510 | VIX=14.9100
+date=2025-12-22 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=88490.0156 | Dollar_Index=98.2900 | US_10Y_Yield=4.1690 | VIX=14.0800
+date=2025-12-23 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87414.0000 | Dollar_Index=97.9400 | US_10Y_Yield=4.1690 | VIX=14.0000
+date=2025-12-24 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87611.9609 | Dollar_Index=97.9800 | US_10Y_Yield=4.1360 | VIX=13.4700
+date=2025-12-25 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87234.7422 | Dollar_Index=97.9800 | US_10Y_Yield=4.1360 | VIX=13.4700
+date=2025-12-26 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87301.4297 | Dollar_Index=98.0200 | US_10Y_Yield=4.1360 | VIX=13.6000
+date=2025-12-27 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87802.1562 | Dollar_Index=98.0200 | US_10Y_Yield=4.1360 | VIX=13.6000
+date=2025-12-28 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87835.8359 | Dollar_Index=98.0200 | US_10Y_Yield=4.1360 | VIX=13.6000
+date=2025-12-29 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87138.1406 | Dollar_Index=98.0400 | US_10Y_Yield=4.1160 | VIX=14.2000
+date=2025-12-30 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=88430.1328 | Dollar_Index=98.2400 | US_10Y_Yield=4.1300 | VIX=14.3300
+date=2025-12-31 | Computer_Electronic_Production_Index=130.0829 | Bitcoin=87508.8281 | Dollar_Index=98.2800 | US_10Y_Yield=4.1630 | VIX=14.9500
+date=2026-01-01 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=88731.9844 | Dollar_Index=98.2800 | US_10Y_Yield=4.1630 | VIX=14.9500
+date=2026-01-02 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=89944.6953 | Dollar_Index=98.4200 | US_10Y_Yield=4.1870 | VIX=14.5100
+date=2026-01-03 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=90603.1875 | Dollar_Index=98.4200 | US_10Y_Yield=4.1870 | VIX=14.5100
+date=2026-01-04 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=91413.4922 | Dollar_Index=98.4200 | US_10Y_Yield=4.1870 | VIX=14.5100
+date=2026-01-05 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=93882.5547 | Dollar_Index=98.2700 | US_10Y_Yield=4.1650 | VIX=14.9000
+date=2026-01-06 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=93729.0312 | Dollar_Index=98.5800 | US_10Y_Yield=4.1790 | VIX=14.7500
+date=2026-01-07 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=91308.0547 | Dollar_Index=98.6800 | US_10Y_Yield=4.1380 | VIX=15.3800
+date=2026-01-08 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=91027.1250 | Dollar_Index=98.9300 | US_10Y_Yield=4.1830 | VIX=15.4500
+date=2026-01-09 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=90513.1016 | Dollar_Index=99.1300 | US_10Y_Yield=4.1710 | VIX=14.4900
+date=2026-01-10 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=90386.6484 | Dollar_Index=99.1300 | US_10Y_Yield=4.1710 | VIX=14.4900
+date=2026-01-11 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=90827.4609 | Dollar_Index=99.1300 | US_10Y_Yield=4.1710 | VIX=14.4900
+date=2026-01-12 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=91192.9922 | Dollar_Index=98.8600 | US_10Y_Yield=4.1870 | VIX=15.1200
+date=2026-01-13 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=95321.7812 | Dollar_Index=99.1300 | US_10Y_Yield=4.1710 | VIX=15.9800
+date=2026-01-14 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=96929.3281 | Dollar_Index=99.1300 | US_10Y_Yield=4.1400 | VIX=16.7500
+date=2026-01-15 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=95551.1875 | Dollar_Index=99.3200 | US_10Y_Yield=4.1600 | VIX=15.8400
+date=2026-01-16 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=95525.1172 | Dollar_Index=99.3900 | US_10Y_Yield=4.2310 | VIX=15.8600
+date=2026-01-17 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=95099.9219 | Dollar_Index=99.3900 | US_10Y_Yield=4.2310 | VIX=15.8600
+date=2026-01-18 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=93634.4297 | Dollar_Index=99.3900 | US_10Y_Yield=4.2310 | VIX=15.8600
+date=2026-01-19 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=92553.5938 | Dollar_Index=99.3900 | US_10Y_Yield=4.2310 | VIX=15.8600
+date=2026-01-20 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=88310.9062 | Dollar_Index=98.6400 | US_10Y_Yield=4.2950 | VIX=20.0900
+date=2026-01-21 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=89376.9609 | Dollar_Index=98.7600 | US_10Y_Yield=4.2530 | VIX=16.9000
+date=2026-01-22 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=89462.4531 | Dollar_Index=98.3600 | US_10Y_Yield=4.2490 | VIX=15.6400
+date=2026-01-23 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=89503.8750 | Dollar_Index=97.6000 | US_10Y_Yield=4.2390 | VIX=16.0900
+date=2026-01-24 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=89110.7344 | Dollar_Index=97.6000 | US_10Y_Yield=4.2390 | VIX=16.0900
+date=2026-01-25 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=86572.2188 | Dollar_Index=97.6000 | US_10Y_Yield=4.2390 | VIX=16.0900
+date=2026-01-26 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=88267.1406 | Dollar_Index=97.0400 | US_10Y_Yield=4.2130 | VIX=16.1500
+date=2026-01-27 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=89102.5703 | Dollar_Index=96.2200 | US_10Y_Yield=4.2230 | VIX=16.3500
+date=2026-01-28 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=89184.5703 | Dollar_Index=96.4500 | US_10Y_Yield=4.2510 | VIX=16.3500
+date=2026-01-29 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=84561.5859 | Dollar_Index=96.2800 | US_10Y_Yield=4.2270 | VIX=16.8800
+date=2026-01-30 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=84128.6562 | Dollar_Index=96.9900 | US_10Y_Yield=4.2410 | VIX=17.4400
+date=2026-01-31 | Computer_Electronic_Production_Index=131.5861 | Bitcoin=78621.1172 | Dollar_Index=96.9900 | US_10Y_Yield=4.2410 | VIX=17.4400
+date=2026-02-01 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=76974.4453 | Dollar_Index=96.9900 | US_10Y_Yield=4.2410 | VIX=17.4400
+date=2026-02-02 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=78688.7656 | Dollar_Index=97.6100 | US_10Y_Yield=4.2750 | VIX=16.3400
+date=2026-02-03 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=75633.5469 | Dollar_Index=97.4400 | US_10Y_Yield=4.2740 | VIX=18.0000
+date=2026-02-04 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=73019.7031 | Dollar_Index=97.6200 | US_10Y_Yield=4.2750 | VIX=18.6400
+date=2026-02-05 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=62702.0977 | Dollar_Index=97.8200 | US_10Y_Yield=4.2100 | VIX=21.7700
+date=2026-02-06 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70555.3906 | Dollar_Index=97.6300 | US_10Y_Yield=4.2060 | VIX=20.3700
+date=2026-02-07 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=69281.9688 | Dollar_Index=97.6300 | US_10Y_Yield=4.2060 | VIX=20.3700
+date=2026-02-08 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70264.7266 | Dollar_Index=97.6300 | US_10Y_Yield=4.2060 | VIX=20.3700
+date=2026-02-09 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70120.7812 | Dollar_Index=96.8200 | US_10Y_Yield=4.1980 | VIX=17.3600
+date=2026-02-10 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68793.9609 | Dollar_Index=96.8000 | US_10Y_Yield=4.1470 | VIX=17.7900
+date=2026-02-11 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=66991.9688 | Dollar_Index=96.8300 | US_10Y_Yield=4.1720 | VIX=17.6500
+date=2026-02-12 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=66221.8438 | Dollar_Index=96.9300 | US_10Y_Yield=4.1040 | VIX=20.8200
+date=2026-02-13 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68857.8438 | Dollar_Index=96.8800 | US_10Y_Yield=4.0560 | VIX=20.6000
+date=2026-02-14 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=69767.6250 | Dollar_Index=96.8800 | US_10Y_Yield=4.0560 | VIX=20.6000
+date=2026-02-15 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68788.1875 | Dollar_Index=96.8800 | US_10Y_Yield=4.0560 | VIX=20.6000
+date=2026-02-16 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68843.1562 | Dollar_Index=96.8800 | US_10Y_Yield=4.0560 | VIX=20.6000
+date=2026-02-17 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=67494.2188 | Dollar_Index=97.1600 | US_10Y_Yield=4.0520 | VIX=20.2900
+date=2026-02-18 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=66425.3203 | Dollar_Index=97.7000 | US_10Y_Yield=4.0790 | VIX=19.6200
+date=2026-02-19 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=66957.5234 | Dollar_Index=97.9300 | US_10Y_Yield=4.0750 | VIX=20.2300
+date=2026-02-20 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68005.4219 | Dollar_Index=97.8000 | US_10Y_Yield=4.0860 | VIX=19.0900
+date=2026-02-21 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68003.7656 | Dollar_Index=97.8000 | US_10Y_Yield=4.0860 | VIX=19.0900
+date=2026-02-22 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=67659.3906 | Dollar_Index=97.8000 | US_10Y_Yield=4.0860 | VIX=19.0900
+date=2026-02-23 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=64616.7383 | Dollar_Index=97.7000 | US_10Y_Yield=4.0290 | VIX=21.0100
+date=2026-02-24 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=64080.0430 | Dollar_Index=97.8800 | US_10Y_Yield=4.0330 | VIX=19.5500
+date=2026-02-25 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=67960.1250 | Dollar_Index=97.7000 | US_10Y_Yield=4.0480 | VIX=17.9300
+date=2026-02-26 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=67453.7734 | Dollar_Index=97.7900 | US_10Y_Yield=4.0170 | VIX=18.6300
+date=2026-02-27 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=65881.7969 | Dollar_Index=97.6100 | US_10Y_Yield=3.9620 | VIX=19.8600
+date=2026-02-28 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=66995.8594 | Dollar_Index=97.6100 | US_10Y_Yield=3.9620 | VIX=19.8600
+date=2026-03-01 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=65738.1016 | Dollar_Index=97.6100 | US_10Y_Yield=3.9620 | VIX=19.8600
+date=2026-03-02 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68775.8516 | Dollar_Index=98.3800 | US_10Y_Yield=4.0480 | VIX=21.4400
+date=2026-03-03 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68293.6484 | Dollar_Index=99.0500 | US_10Y_Yield=4.0560 | VIX=23.5700
+date=2026-03-04 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=72710.5781 | Dollar_Index=98.7700 | US_10Y_Yield=4.0800 | VIX=21.1500
+date=2026-03-05 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70841.1250 | Dollar_Index=99.3200 | US_10Y_Yield=4.1460 | VIX=23.7500
+date=2026-03-06 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68136.4922 | Dollar_Index=98.9900 | US_10Y_Yield=4.1330 | VIX=29.4900
+date=2026-03-07 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=67272.5938 | Dollar_Index=98.9900 | US_10Y_Yield=4.1330 | VIX=29.4900
+date=2026-03-08 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=65969.7812 | Dollar_Index=98.9900 | US_10Y_Yield=4.1330 | VIX=29.4900
+date=2026-03-09 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68402.3828 | Dollar_Index=99.1800 | US_10Y_Yield=4.1360 | VIX=25.5000
+date=2026-03-10 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=69926.9219 | Dollar_Index=98.8300 | US_10Y_Yield=4.1360 | VIX=24.9300
+date=2026-03-11 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70204.8828 | Dollar_Index=99.2300 | US_10Y_Yield=4.2080 | VIX=24.2300
+date=2026-03-12 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70493.4609 | Dollar_Index=99.7400 | US_10Y_Yield=4.2730 | VIX=27.2900
+date=2026-03-13 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70968.2656 | Dollar_Index=100.3600 | US_10Y_Yield=4.2850 | VIX=27.1900
+date=2026-03-14 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=71214.6250 | Dollar_Index=100.3600 | US_10Y_Yield=4.2850 | VIX=27.1900
+date=2026-03-15 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=72789.9141 | Dollar_Index=100.3600 | US_10Y_Yield=4.2850 | VIX=27.1900
+date=2026-03-16 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=74861.0859 | Dollar_Index=99.7100 | US_10Y_Yield=4.2200 | VIX=23.5100
+date=2026-03-17 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=73922.4766 | Dollar_Index=99.5800 | US_10Y_Yield=4.2020 | VIX=22.3700
+date=2026-03-18 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=71245.5781 | Dollar_Index=100.0900 | US_10Y_Yield=4.2590 | VIX=25.0900
+date=2026-03-19 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=69912.7891 | Dollar_Index=99.2300 | US_10Y_Yield=4.2810 | VIX=24.0600
+date=2026-03-20 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70522.5859 | Dollar_Index=99.6500 | US_10Y_Yield=4.3910 | VIX=26.7800
+date=2026-03-21 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68711.5234 | Dollar_Index=99.6500 | US_10Y_Yield=4.3910 | VIX=26.7800
+date=2026-03-22 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=67845.2109 | Dollar_Index=99.6500 | US_10Y_Yield=4.3910 | VIX=26.7800
+date=2026-03-23 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70914.8594 | Dollar_Index=98.9500 | US_10Y_Yield=4.3340 | VIX=26.1500
+date=2026-03-24 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=70517.8594 | Dollar_Index=99.4300 | US_10Y_Yield=4.3920 | VIX=26.9500
+date=2026-03-25 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=71309.8828 | Dollar_Index=99.6000 | US_10Y_Yield=4.3280 | VIX=25.3300
+date=2026-03-26 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=68791.6250 | Dollar_Index=99.9000 | US_10Y_Yield=4.4160 | VIX=27.4400
+date=2026-03-27 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=66338.3750 | Dollar_Index=100.1500 | US_10Y_Yield=4.4400 | VIX=31.0500
+date=2026-03-28 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=66319.6953 | Dollar_Index=100.1500 | US_10Y_Yield=4.4400 | VIX=31.0500
+date=2026-03-29 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=65954.9219 | Dollar_Index=100.1500 | US_10Y_Yield=4.4400 | VIX=31.0500
+date=2026-03-30 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=65954.9219 | Dollar_Index=100.5100 | US_10Y_Yield=4.3420 | VIX=30.6100
+date=2026-03-31 | Computer_Electronic_Production_Index=132.1125 | Bitcoin=67535.3203 | Dollar_Index=100.4390 | US_10Y_Yield=4.3420 | VIX=30.6100
